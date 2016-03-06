@@ -4,49 +4,55 @@ function Model_learn( opt)
 
 
 
-load(get_path(opt), 'y', 'y_orig', 'data'); %could load opt as well, but it may have changed
+load(get_path(opt), 'inp'); %could load opt as well, but it may have changed
+inp.opt = struct_merge(inp.opt, opt);
 
-if opt.mask
-  load(get_path(opt), 'UserMask');
+
+
+if inp.opt.mask
+  UserMask = inp.UserMask;
 end
 
-W  = Model_initialize(opt);
+W  = Model_initialize(inp.opt);
 
 tic;
 
 %% Run the learning
-for n = 1:opt.niter 
+for n = 1:inp.opt.niter 
     
 
-    fprintf('Iteration %d/%d, inferring cell locations...\n', n, opt.niter);
+    fprintf('Iteration %d/%d, inferring cell locations...\n', n, inp.opt.niter);
     %Compute convolution of Y with the filters as well as the "local Gram
     %matrices of filters to use in the matching pursuit step afterwards
-    [WY, GW, WnormInv] = compute_filters(data, W, opt );
+    [WY, GW, WnormInv] = compute_filters(inp.data, W, inp.opt );
     
     %Infer the hidden variables (H - location, X - reconstruction weight, L - log likelihood gain)
-    if ~opt.mask
-      [ H, X, L] = extract_coefs( WY, GW, WnormInv, W, opt);
+    if ~inp.opt.mask
+      [ H, X, L] = extract_coefs( WY, GW, WnormInv, W, inp.opt);
     else
-      [ H, X, L] = extract_coefs( WY, GW, WnormInv, W, opt, UserMask);
+      [ H, X, L] = extract_coefs( WY, GW, WnormInv, W, inp.opt, UserMask);
     end
 
     %Save results from current iteration
-    save(get_path(opt,'output_iter',n) ,'y','y_orig','H','X','L','W','opt')% 
+    results = chomp_results(inp.opt,W,H,X,L,inp.y,inp.y_orig,inp.V);
+    save(get_path(inp.opt,'output_iter',n) ,'results')
     
     %Visualize results
-    if opt.fig >0
-      update_visualize( y,H,reshape(W,opt.m,opt.m,size(W,2)),opt,1);
+    if inp.opt.fig >0
+      update_visualize(results.y,results.H, ...
+        reshape(results.W,results.opt.m,results.opt.m,size(results.W,ndims(results.W))),...
+        results.opt,1);
     end
 
-    if n < opt.niter && opt.learn
+    if n < inp.opt.niter && inp.opt.learn
       %Update the dictionary (the W filters)
-      fprintf('Iteration %d/%d, updating dictionary...\n', n, opt.niter);
-      [W] = update_dict(data,H,W,opt,n+2);
+      fprintf('Iteration %d/%d, updating dictionary...\n', n, inp.opt.niter);
+      [W] = update_dict(inp.data,results.H,results.W,inp.opt,n+2);
     end
     
    
    if rem(n,1)==0
-        fprintf('Iteration %d/%d finished, elapsed time is %0.2f seconds\n', n, opt.niter, toc)
+        fprintf('Iteration %d/%d finished, elapsed time is %0.2f seconds\n', n, inp.opt.niter, toc)
     end
     
 

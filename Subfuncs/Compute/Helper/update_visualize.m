@@ -26,6 +26,8 @@ xs  = repmat(-d:d, m, 1);
 ys  = xs';
 rs2 = (xs.^2+ys.^2);
 
+% Sets the opacity of individual red dots according to their position in the order
+alphaspace = logspace(1,0,numel(H))/10; %TODO make that it is according to the score instead of position in order (needs more input to the func tho)
 
     sign_center = -squeeze(sign(W(d,d,:)));
     sign_center(:) = 1;
@@ -51,23 +53,24 @@ rs2 = (xs.^2+ys.^2);
     colormap gray
     mycolor = 'rymg';
 
-    H0      = H;
-    elem    = get_elem(H0, size(y,1), isfirst, KS);
-
 
 
     if isempty(show_specific)
-      show_specific = 1:length(elem.iy);
+      show_specific = 1:size(H,1);
     end
     hold on
-    axis square
-    for i12 = show_specific%[1,5,10,20,30, 50] %1:length(elem.iy)
+    axis image
+    for i12 = show_specific%[1,5,10,20,30, 50] %1:length(col)
+      [row,col] = ind2sub(size(y),H(i12));
+      map = 1; %TODO multiple object types, fix map
       if show_numbers
-        text(elem.iy(i12), elem.ix(i12), num2str(i12), 'Color',mycolor(mod(elem.map(i12)-1,length(mycolor))+1),'FontSize',16,'FontWeight','bold');
+        text(col, row, num2str(i12), 'Color',mycolor(mod(map-1,length(mycolor))+1),'FontSize',20,'FontWeight','bold');
       else
-        plot(elem.iy(i12), elem.ix(i12), 'or' , 'Linewidth', 2, 'MarkerSize', 4, 'MarkerFaceColor', mycolor(mod(elem.map(i12)-1,length(mycolor))+1), 'MarkerEdgeColor', mycolor(mod(elem.map(i12)-1,length(mycolor))+1))
+        %tmp1 = plot(col(i12), row(i12), 'or' , 'Linewidth', 2, 'MarkerSize', 4, 'MarkerFaceColor', mycolor(mod(map(i12)-1,length(mycolor))+1), 'MarkerEdgeColor', mycolor(mod(elem.map(i12)-1,length(mycolor))+1));
+        tmp1 = scatter(col, row, 30, 'r', 'filled');
+        alpha(tmp1, alphaspace(i12))
       end
-%             text(elem.iy(i12), elem.ix(i12), num2str(i12), 'Color',mycolor(mod(elem.map(i12)-1,length(mycolor))+1));
+%             text(col(i12), row(i12), num2str(i12), 'Color',mycolor(mod(map(i12)-1,length(mycolor))+1));
 %             title(i12);
 %             waitforbuttonpress; 
     end

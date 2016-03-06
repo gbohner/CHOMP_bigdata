@@ -7,6 +7,7 @@ opt = struct();
 
 opt.code_path = [fileparts(mfilename('fullpath')) filesep]; %Package directory
 opt.data_path = 'default_path'; %Input data file (stack, or initial frame)
+opt.root_folder = ''; % Can set a root folder in case of remote work (sshfs or runs from different users/systems mac vs linux directory structure). All other folders below will be calculated relative from the root folder
 opt.input_folder = './tmp/input/'; %Store preprocessed input data, if you change it, use full path
 opt.output_folder = './tmp/output/'; %Output folder, if you change it, use full path
 opt.precomputed_folder = './tmp/precomputed/'; % Stores precomputed tensors

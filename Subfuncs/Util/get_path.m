@@ -14,12 +14,18 @@ else
       output = [opt.input_folder opt.file_prefix '_' opt.timestamp '_virtual_stack.mat'];
     case 'raw_virtual_stack'
       output = [opt.input_folder opt.file_prefix '_virtual_stack_raw.mat'];
+    case 'raw_stabilized_frames'
+      if numel(varargin) == 1 %return folder
+        output = [opt.input_folder opt.file_prefix '_stabilized' filesep];
+      else %return frame to write to
+        output = [opt.input_folder opt.file_prefix '_stabilized' filesep opt.file_prefix '_stabilized_' sprintf('%.5d',uint16(varargin{2})) '.tif'];
+      end
     otherwise
        error('CHOMP:util:nopath', 'The type of path you want get_path() to return is not implemented');
   end
 end
-      
 
+output = [opt.root_folder output]; %Add the root folder in case of sshfs work
 
 end
 

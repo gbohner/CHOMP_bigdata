@@ -52,7 +52,7 @@ if exist(intermediate_path, 'file')
 else %Handle the data loading-preprocessing-saving
 
   %Set the input data path
-  data_path = opt.data_path;
+  data_path = [opt.root_folder opt.data_path];
   
   if ~exist(data_path,'file')
       error('CHOMP:preprocess:noinputdata', ...
@@ -209,22 +209,21 @@ else %Handle the data loading-preprocessing-saving
   end
   
   
-  save(intermediate_path, 'data', 'y', 'y_orig','V', 'opt','-v7.3');
+  inp = chomp_input(opt,data, y, y_orig,V); %The input class that stores raw and preproc data
   
   
    %let the user create a mask over the image to limit the processed area
   if opt.mask
     if ~isempty(opt.mask_image) 
-        UserMask = opt.mask_image;
+        inp.UserMask = opt.mask_image;
     else
       imshow(y);
-      UserMask = roipoly(mat2gray(y));
+      inp.UserMask = roipoly(mat2gray(y));
     end
   end
-
-  if opt.mask
-    save(intermediate_path, 'UserMask', '-append');
-  end
+  
+  save(intermediate_path, 'inp','-v7.3');
+  
   
 
 end
