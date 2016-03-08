@@ -1,0 +1,3 @@
+To use relative path names below an every-changing wokring directory, set "CHOMP_ROOT_FOLDER" enviromental variable to the directory you want to start from.
+Very useful during SSHFS mounting of external drives. The classes will detect the enviroment on-load, so you always have the correct data path no matter if you work
+directly on the remote server, or on the local computer.

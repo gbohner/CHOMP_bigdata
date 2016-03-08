@@ -2,6 +2,8 @@ function opt = StabilizeFrames( opt )
 %STABILIZEFRAMES Summary of this function goes here
 %   Detailed explanation goes here
 
+if ~opt.stabilize,return; end
+
 %For now just implement for frames and frames_virtual
   if strcmp(opt.data_type(1:6),'frames')
     %Align to cascading mean

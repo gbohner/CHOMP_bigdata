@@ -1,13 +1,22 @@
 %% Loading
-load(get_path(opt),'inp');
+%Load the input file we wanna use (mostly manual for now)
+%load(get_path(opt),'inp'); 
+addpath('/mnt/stanford/home/djoshea/code/rig1/analysis/djoshea')
+addpath('/mnt/stanford/home/djoshea/code/rig1/analysis/djoshea/utils')
+import Regress.plotTuningColorGuide
+
+load('/mnt/stanford/neurotank/derived/gbohner/input/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-021_Cycle00001_Ch2_000001.ome_20160307T160319.mat')
 data = inp.data;
 load(get_path(inp.opt,'output_iter',inp.opt.niter),'results');
 [H, W, X, y_orig, y] = results.get_fields( 'H', 'W', 'X', 'y_orig','y');
 
 opt=inp.opt;
 
+
+
 %% Getting ROIs
 close all;
+getRandom = 0;
 update_visualize( y,H,reshape(W,opt.m,opt.m,size(W,2)),opt,1,1);
 %opt.ROI_type = 'mean_origsize';
 %opt.ROI_type = 'quantile_origsize';
@@ -15,12 +24,39 @@ update_visualize( y,H,reshape(W,opt.m,opt.m,size(W,2)),opt,1,1);
 opt.ROI_type = 'quantile_dynamic_origsize';
 opt.ROI_params = 0.6;
 %opt.ROI_params = 0.7;
-[ROI_mask, ROIs] = getROIs(opt, min(30,numel(H))); opt.fig = 2;
-figure(5); imagesc(y_orig); colormap gray; axis image;
+if getRandom
+  [ROI_mask, ROIs] = getROIs(opt, min(30,numel(H)),1); opt.fig = 2;
+else
+  [ROI_mask, ROIs] = getROIs(opt, min(30,numel(H)),0); opt.fig = 2;
+end
+figure(5);
+% subplottight(2, 1, 2);
+h_rois = imagesc(y_orig); colormap gray; axis image;
 B = bwboundaries(ROI_mask);
 hold on;
 visboundaries(B)
+for i1 = 1:numel(ROIs)
+  text(ROIs{i1}.col, ROIs{i1}.row, num2str(i1), 'Color','r','FontSize',20,'FontWeight','bold');
+end
+  set(gca, 'XTick', []);
+   set(gca, 'YTick', []);
+%    
+% subplottight(2, 1, 1);
+% imagesc(out_im); axis image
+% set(gca, 'XTick', []);
+% set(gca, 'YTick', []);
+% axes('Position', [0.85 0.85 0.15 0.15]);
+% plotTuningColorGuide();
+ 
 pause(0.3);
+
+if getRandom
+  print(gcf,'cur_ROIs_rand.eps','-depsc2')
+else
+  print(gcf,'cur_ROIs.eps','-depsc2')
+  print(gcf,'cur_ROIs.png','-dpng')
+end
+
 
 %% Getting timeseries from ROIs
 szY = chomp_size(data.proc_stack, 'Y');
@@ -39,7 +75,11 @@ for i1 = 1:numel(H)
     %pause(0.5);
 end
 
-save('cur_time_series','timeseries','ROIs','ROI_mask');
+if getRandom
+  save('cur_time_series_rand','timeseries','ROIs','ROI_mask');
+else
+  save('cur_time_series','timeseries','ROIs','ROI_mask');
+end
 
 %% Just plotting
 

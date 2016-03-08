@@ -23,22 +23,19 @@ end
 [s,mess,messid] = mkdir([opt.root_folder opt.precomputed_folder]);
 
 
-%Stabilize the data if asked for:
-if opt.stabilize
-  opt = StabilizeFrames(opt);
-end
+%Stabilize the image stack
+opt = StabilizeFrames(opt);
 
-%Preprocess the data, store it in tmp folder, time-stamped. Make sure to
-%return updated opt for futher processing
+%Preprocess the data, store it in the input folder, time-stamped
 opt = extractData(opt);
 
-%Learn the cell model from the data
+%Learn the cell model from the data, store in the output folder
 Model_learn(opt);
 
 %Collect results
 [ROI_mask, ROIs] = getROIs(opt);
 
-%Clean up if required
+%Clean up if required (delete unnecessary inbetween files etc)
 if opt.cleanup
 end
 

@@ -13,6 +13,14 @@ else
   num_reconst = length(H);
 end
 
+if nargin>2
+  if varargin{2}
+    %Get random ROIs
+    H = floor(1+rand(size(H)).*numel(y));
+    X = randn(size(X));
+  end
+end
+
 sz = size(y);
 
 ROIs = cell(num_reconst,1);

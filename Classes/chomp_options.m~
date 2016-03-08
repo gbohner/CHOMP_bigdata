@@ -39,7 +39,6 @@ classdef chomp_options < handle
 
      % Learning parameters
      niter = 3; % number of iterations
-     init_iter = 0; %Set the initial iteration. If not 0, search for the file with appropriate name
       %     relweight = 10; % weighting between importance of covariance / mean (automatically set to 'optimal' value in Shared_main/extract_coefs.m)
      fig = 1; %Whether to visualize or not during learning
      ex = 1; % what example image to display during training
@@ -63,8 +62,7 @@ classdef chomp_options < handle
      cleanup = 0;
 
      timestamp % Timestamping every operation
-     
-     
+     resume = 0; %Set to 1 if 
   end
   
   methods

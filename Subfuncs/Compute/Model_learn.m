@@ -6,19 +6,45 @@ function Model_learn( opt)
 
 load(get_path(opt), 'inp'); %could load opt as well, but it may have changed
 inp.opt = struct_merge(inp.opt, opt);
+% 
+% if inp.opt.init_iter
+%   load(get_path(inp.opt,'output_iter',inp.opt.init_iter) ,'model')
+%   if inp.opt.init_iter < inp.opt.niter && inp.opt.learn
+%       %Update the dictionary (the W filters)
+%       fprintf('Iteration %d/%d, updating dictionary...\n', inp.opt.init_iter, inp.opt.niter);
+%       [W] = update_dict(inp.data,model.H,model.W,inp.opt,inp.opt.init_iter+2);
+%   elseif ~isempty(inp.opt.init_W)
+%     W = inp.opt.init_W;
+%   else
+%     W = model.W;
+%   end
+% else
+%   W  = Model_initialize(inp.opt);
+% end
 
-
-
-if inp.opt.mask
-  UserMask = inp.UserMask;
+%TODO just doing this for compatibility once, then remove and uncomment
+%above
+if inp.opt.init_iter
+  load(get_path(inp.opt,'output_iter',inp.opt.init_iter) ,'results')
+  if inp.opt.init_iter < inp.opt.niter && inp.opt.learn
+      %Update the dictionary (the W filters)
+      fprintf('Iteration %d/%d, updating dictionary...\n', inp.opt.init_iter, inp.opt.niter);
+      [W] = update_dict(inp.data,results.H,results.W,inp.opt,inp.opt.init_iter+2);
+  elseif ~isempty(inp.opt.init_W)
+    W = inp.opt.init_W;
+  else
+    W = results.W;
+  end
+else
+  W  = Model_initialize(inp.opt);
 end
 
-W  = Model_initialize(inp.opt);
+
 
 tic;
 
 %% Run the learning
-for n = 1:inp.opt.niter 
+for n = (inp.opt.init_iter+1):inp.opt.niter 
     
 
     fprintf('Iteration %d/%d, inferring cell locations...\n', n, inp.opt.niter);
@@ -30,24 +56,24 @@ for n = 1:inp.opt.niter
     if ~inp.opt.mask
       [ H, X, L] = extract_coefs( WY, GW, WnormInv, W, inp.opt);
     else
-      [ H, X, L] = extract_coefs( WY, GW, WnormInv, W, inp.opt, UserMask);
+      [ H, X, L] = extract_coefs( WY, GW, WnormInv, W, inp.opt, inp.UserMask);
     end
 
-    %Save results from current iteration
-    results = chomp_results(inp.opt,W,H,X,L,inp.y,inp.y_orig,inp.V);
-    save(get_path(inp.opt,'output_iter',n) ,'results')
+    %Save model from current iteration
+    model = chomp_model(inp.opt,W,H,X,L,inp.y,inp.y_orig,inp.V);
+    save(get_path(inp.opt,'output_iter',n) ,'model')
     
-    %Visualize results
+    %Visualize model
     if inp.opt.fig >0
-      update_visualize(results.y,results.H, ...
-        reshape(results.W,results.opt.m,results.opt.m,size(results.W,ndims(results.W))),...
-        results.opt,1);
+      update_visualize(model.y,model.H, ...
+        reshape(model.W,model.opt.m,model.opt.m,size(model.W,ndims(model.W))),...
+        model.opt,1);
     end
 
     if n < inp.opt.niter && inp.opt.learn
       %Update the dictionary (the W filters)
       fprintf('Iteration %d/%d, updating dictionary...\n', n, inp.opt.niter);
-      [W] = update_dict(inp.data,results.H,results.W,inp.opt,n+2);
+      [W] = update_dict(inp.data,model.H,model.W,inp.opt,n+2);
     end
     
    

@@ -15,37 +15,36 @@ function opt = extractData( opt )
 %Check if we want to just load an already preprocessed file
 if exist(intermediate_path, 'file')
   %If it already exists, check if the preprocessing options are the same, and just load the files
-  opt_old = load(intermediate_path, 'opt');
+  inp = load(intermediate_path, 'inp');
+  inp = inp.inp;
   
-  if ~struct_contain(opt, opt_old.opt, {'spatial_scale', 'time_scale', 'whiten', 'smooth_filter_mean' , 'smooth_filter_var'})
+  if ~struct_contain(opt, inp.opt, {'spatial_scale', 'time_scale', 'whiten', 'smooth_filter_mean' , 'smooth_filter_var'})
     error('CHOMP:preprocess:outdatedoptions', ...
       ['The new option struct has different preprocessing options than the', ...
        'intermediate file you want to use it with, consider removing manual timestamp' ...
        'from your input options file to create a new preprocessed file']);
   else
-    if ~struct_contain(opt, opt_old.opt) %some settings has changed, give warning, and let user create a new copy of the file with new timestamp
+    if ~struct_contain(opt, inp.opt) %some settings has changed, give warning, and let user create a new copy of the file with new timestamp
       warning('CHOMP:preprocess:outdatedoptions', 'The new option struct has different options than the intermediate file you want to use it with.');
       user_ans = input('Continue processing with an updated copy of the intermediate file (y) or load the old one (n)? y/n  ', 's');
       if strcmp('y', user_ans) % get new time stamp, copy the file, update options
-        opt.timestamp = datestr(now, 30);
-        opt = struct_merge(opt_old.opt, opt);
-        old_path = intermediate_path;
-        intermediate_path = get_path(opt);
-        copyfile(old_path,intermediate_path);
-        save(intermediate_path, 'opt', '-append'); %overwrite the old options file within the file with the new time stamp
+        inp.opt = struct_merge(inp.opt, opt);
+        intermediate_path = get_path(inp.opt);
+        save(intermediate_path, 'inp', '-append'); %overwrite the old options file within the file with the new time stamp
       end
     end
-    if opt.mask %Check if we need to update the user mask in the new file
-      if ~isempty(opt.mask_image) 
-        UserMask = opt.mask_image;
-        save(intermediate_path, 'UserMask', '-append');
-      elseif opt.mask_overwrite==1 || opt_old.opt.mask==0
-        load(intermediate_path,'y');
-        figure(1); imagesc(y); axis square; colormap gray;
-        UserMask = roipoly(mat2gray(y));
-        save(intermediate_path, 'UserMask', '-append');
-      end
-    end
+% TODO: fix the mask update part    
+%     if opt.mask %Check if we need to update the user mask in the new file
+%       if ~isempty(opt.mask_image) 
+%         UserMask = opt.mask_image;
+%         save(intermediate_path, 'UserMask', '-append');
+%       elseif opt.mask_overwrite==1 || inp.opt.mask==0
+%         load(intermediate_path,'y');
+%         figure(1); imagesc(y); axis square; colormap gray;
+%         UserMask = roipoly(mat2gray(y));
+%         save(intermediate_path, 'UserMask', '-append');
+%       end
+%     end
   end
      
   

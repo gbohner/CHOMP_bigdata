@@ -27,12 +27,7 @@ classdef chomp_input < handle
       addlistener(obj.opt, 'root_folder', 'PostSet',@(src, evnt)chomp_input.opt_change_post(obj, src, evnt));
     end
 
-    %Check to set data pathes in a different environment on load
-    function loadobj()
-      %Look for enviroment variable
-      obj.opt.root_folder = getenv('CHOMP_ROOT_FOLDER'); %TODO make sure it is firing the event
-    end
-    
+
     function s = export_struct(obj)
       p = properties(obj);
       for i1 = 1:numel(p)
@@ -43,6 +38,15 @@ classdef chomp_input < handle
   end
   
   methods (Static)
+    %Check to set data pathes in a different environment on load
+    function obj = loadobj(obj)
+      %Look for enviroment variable
+      addlistener(obj.opt, 'root_folder', 'PreSet',@(src, evnt)chomp_input.opt_change_pre(obj, src, evnt));
+      addlistener(obj.opt, 'root_folder', 'PostSet',@(src, evnt)chomp_input.opt_change_post(obj, src, evnt));
+      
+      obj.opt.root_folder = getenv('CHOMP_ROOT_FOLDER'); %TODO make sure it is firing the event
+    end
+    
     %Change data pathes if options change
     function opt_change_pre(obj, src, evnt)
       disp('opt_change_pre')
@@ -57,7 +61,7 @@ classdef chomp_input < handle
       disp('opt_change_post')
       obj.data.raw_stack = matfile([obj.opt.root_folder obj.data.raw_stack]);
       if isa(obj.data.proc_stack, 'char')
-        obj.data.proc_stack.Properties.Source = matfile([obj.opt.root_folder obj.data.proc_stack]);
+        obj.data.proc_stack = matfile([obj.opt.root_folder obj.data.proc_stack]);
       end
     end    
   end
