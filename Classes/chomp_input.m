@@ -51,17 +51,17 @@ classdef chomp_input < handle
     function opt_change_pre(obj, src, evnt)
       disp('opt_change_pre')
       disp(obj);
-      obj.data.raw_stack = obj.data.raw_stack.Properties.Source((length(obj.opt.root_folder)+1):end); %Just get the substring with the original root folder removed
-      if isa(obj.data.proc_stack, 'matlab.io.MatFile')
-        obj.data.proc_stack = obj.data.proc_stack.Properties.Source((length(obj.opt.root_folder)+1):end); %Just get the substring with the original root folder removed
+      obj.data.raw_stack.Y.Source(1:(length(obj.opt.root_folder))) = []; %Just get the substring with the original root folder removed
+      if isa(obj.data.proc_stack.Y, 'chomp_data')
+        obj.data.proc_stack.Y.Source(1:(length(obj.opt.root_folder))) = [];
       end
     end
     
     function opt_change_post(obj, src, evnt)
       disp('opt_change_post')
-      obj.data.raw_stack = matfile([obj.opt.root_folder obj.data.raw_stack]);
-      if isa(obj.data.proc_stack, 'char')
-        obj.data.proc_stack = matfile([obj.opt.root_folder obj.data.proc_stack]);
+      obj.data.raw_stack.Y.Source = [obj.opt.root_folder obj.data.raw_stack.Y.Source];
+      if isa(obj.data.proc_stack.Y, 'chomp_data')
+        obj.data.proc_stack.Y.Source = [obj.opt.root_folder obj.data.proc_stack.Y.Source];
       end
     end    
   end

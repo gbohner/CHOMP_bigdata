@@ -5,7 +5,7 @@ cd(fileparts(mfilename('fullpath')));
 addpath('./Classes')
 
 opt = chomp_options(...
-    'root_folder', '/mnt/stanford', ...
+    'root_folder', getenv('CHOMP_ROOT_FOLDER'), ...
     'input_folder', '/neurotank/derived/gbohner/input/', ...
     'output_folder', '/neurotank/derived/gbohner/output/', ...
     'precomputed_folder', '/neurotank/derived/gbohner/precomputed/', ...
@@ -52,10 +52,10 @@ opt.data_path = '/neurotank/Watkins/2016-02-12/2P/CenterOutReach/site005/Tseries
 % opt.precomputed_folder = '~/stanford/precomputed/';
 
 % Varius param settings
-opt.spatial_scale = 0.2;
-opt.m = 5;
+opt.spatial_scale = 0.25;
+opt.m = 7;
 %opt.spatial_push = @(grid_dist)logsig(0.5*grid_dist-floor((opt.m+3)/2-1)); %Should be change when opt.m is changed (%TODO automatically, perhaps with linking to the opt.m variable, symbolic matlab)
-opt.mom = 4;
+opt.mom = 2;
 opt.data_type = 'frames_virtual';
  
 [~, opt.file_prefix] = fileparts(opt.data_path);

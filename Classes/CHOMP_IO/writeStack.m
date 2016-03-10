@@ -26,7 +26,7 @@ function writeStack( path, data, varargin )
         headerSize = double([dims, szData(1:2), szData(3) + size(p.Results.data,3)]);
         frewind(fid);
       else        
-        headerSize = double([ndims(p.Results.data), size(p.Results.data)]);
+        headerSize = double([3, padarray(size(p.Results.data),[0, 3-ndims(p.Results.data)],1,'post')]);
       end
       fwrite(fid,headerSize,'double');
       

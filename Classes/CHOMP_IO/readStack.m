@@ -8,7 +8,7 @@ function out = readStack(path, varargin)
   fid = fopen(p.Results.path,'r');
   dims = fread(fid, 1, 'double');
   szData = fread(fid,uint16(dims),'double')';
-  headerStr = char(fread(fid,30,'char'))';
+  headerStr = char(fread(fid,100,'char'))';
   
   p.addOptional('frames',1:szData(end),@isfloat);
   p.addParameter('patch',[],@(x)any([isempty(x),isstruct(x),iscell(x)]));

@@ -19,7 +19,7 @@ classdef chomp_data
     function out = subsref(obj, subs)
       if strcmp(subs(1).type,'.')
         out = obj.(subs(1).subs);
-      elseif strcmp(subs(1).type, '()'),'Wrong chomp_data subsref')
+      elseif strcmp(subs(1).type, '()')
         assert(numel(subs(1).subs)==numel(size(obj)),'Wrong chomp_data subsref #dims');
         szData = size(obj);
         if strcmp(subs(1).subs{3},':')

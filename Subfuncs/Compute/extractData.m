@@ -25,13 +25,13 @@ if exist(intermediate_path, 'file')
        'from your input options file to create a new preprocessed file']);
   else
     if ~struct_contain(opt, inp.opt) %some settings has changed, give warning, and let user create a new copy of the file with new timestamp
-      warning('CHOMP:preprocess:outdatedoptions', 'The new option struct has different options than the intermediate file you want to use it with.');
-      user_ans = input('Continue processing with an updated copy of the intermediate file (y) or load the old one (n)? y/n  ', 's');
-      if strcmp('y', user_ans) % get new time stamp, copy the file, update options
-        inp.opt = struct_merge(inp.opt, opt);
-        intermediate_path = get_path(inp.opt);
-        save(intermediate_path, 'inp', '-append'); %overwrite the old options file within the file with the new time stamp
-      end
+      warning('CHOMP:preprocess:outdatedoptions', 'The new option struct has slightly different options than the intermediate file you want to use it with.');
+%       user_ans = input('Continue processing with an updated copy of the intermediate file (y) or load the old one (n)? y/n  ', 's');
+%       if strcmp('y', user_ans) % get new time stamp, copy the file, update options
+%         inp.opt = struct_merge(inp.opt, opt);
+%         intermediate_path = get_path(inp.opt);
+%         save(intermediate_path, 'inp', '-append'); %overwrite the old options file within the file with the new time stamp
+%       end
     end
 % TODO: fix the mask update part    
 %     if opt.mask %Check if we need to update the user mask in the new file
@@ -139,7 +139,7 @@ else %Handle the data loading-preprocessing-saving
       s2 = 0;
       for i2 = 1:T
         im_cur = double(imread([filepath allfiles(i2).name]));
-        if ~raw_stack_done && i2>1, append(data.raw_stack.Y, im_cur); end
+        if (~raw_stack_done) && (i2>1), append(data.raw_stack.Y, im_cur); end
         Ytmp(:,:,mod(i2,100)+floor(i2/100)*100) = imresize(im_cur,opt.spatial_scale,'bicubic');
         if (mod(i2,100) == 0) || (i2 == T)
           if s2==0
@@ -208,12 +208,7 @@ else %Handle the data loading-preprocessing-saving
       end
   end
   data.proc_stack.Y = chomp_data(data.proc_stack.Y.Source,tmp);
-  
-  %make virtual stacks read-only
-  data.raw_stack = matfile(data.raw_stack.Properties.Source, 'Writable',false); 
-  if isa(data.proc_stack, 'matlab.io.MatFile')
-    data.proc_stack = matfile(data.proc_stack.Properties.Source, 'Writable',false);
-  end
+
   inp = chomp_input(opt,data, y, y_orig,V); %The input class that stores raw and preproc data
   
   
