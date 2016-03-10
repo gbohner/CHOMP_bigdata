@@ -14,7 +14,6 @@ szY = chomp_size(data.proc_stack,'Y'); %size of the data tensor
 
 WY = zeros([szY(1:2),opt.NSS*opt.KS,opt.mom]); %big matrix storing the vector resulting of filtering for each location, filter and moment
 
-
 % Compute the convolutions with the filters
 for filt = 1:size(W,2); %Different filters
   Wcur = W(:,filt);
@@ -24,11 +23,13 @@ for filt = 1:size(W,2); %Different filters
   
   for t1 = 1:szY(end) %Can be done parallelly or on GPU 
     conv_result = conv2(data.proc_stack.Y(:,:,t1),Wconv,'same');
-    for mom = 1:opt.mom  %Get moments of the projected time course at each possible cell location %TODO - this might be wrong, because it assumes equal weighting??? but it's filter by filter, so maybe the linear combination of filters is still linear in the higher moments %TOTHINK Nah it seems correct
+    for mom = 1:opt.mom  %Get raw moments of the projected time course at each possible cell location %TODO - this might be wrong, because it assumes equal weighting??? but it's filter by filter, so maybe the linear combination of filters is still linear in the higher moments %TOTHINK Nah it seems correct
       WY(:,:,filt,mom) = WY(:,:,filt,mom) + conv_result.^mom./szY(end);
     end
   end
 end
+
+%TODO Convert the raw moment estimates into cumulant estimates
 
 
 WnormInv = zeros(size(W,2),size(W,2),opt.mom); % Inverse Interaction between basis functions

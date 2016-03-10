@@ -7,8 +7,8 @@ import Regress.plotTuningColorGuide
 
 load('/mnt/stanford/neurotank/derived/gbohner/input/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-021_Cycle00001_Ch2_000001.ome_20160307T160319.mat')
 data = inp.data;
-load(get_path(inp.opt,'output_iter',inp.opt.niter),'results');
-[H, W, X, y_orig, y] = results.get_fields( 'H', 'W', 'X', 'y_orig','y');
+load(get_path(inp.opt,'output_iter',inp.opt.niter),'model');
+[H, W, X, y_orig, y] = model.get_fields( 'H', 'W', 'X', 'y_orig','y');
 
 opt=inp.opt;
 
@@ -59,20 +59,13 @@ end
 
 
 %% Getting timeseries from ROIs
-szY = chomp_size(data.proc_stack, 'Y');
+szY = chomp_size(data.raw_stack, 'Y');
 timeseries = zeros(numel(H), szY(3));
 
+patches = get_patch(s2,opt,H,1:szY(3));
+
 for i1 = 1:numel(H)
-    [row, col] = ind2sub(size(y),H(i1));
-    %TODO something is being weird with reading patches from the original
-    %image stack, prob fixed by matlab virtual stacks of raw data.
-    patch = get_orig_patch_time_block( data, row,col, opt ); %this is the correct version (cause of imread being weird)
-    %patch = get_patch_time_block( data, row,col, opt.m ); %this is the correct version (cause of imread being weird)
-    timeseries(i1,:) = ROIs{i1}.mask(:)'*reshape(patch,size(patch,1)*size(patch,2),[]);
-%     figure(6); imagesc(mean(patch,3))
-%     figure(7); imagesc(ROIs{i1}.mask)
-%     pause
-    %pause(0.5);
+  timeseries(i1,:) = mply(ROIs{i1}.mask, patches(:,:,:,i1),2);
 end
 
 if getRandom

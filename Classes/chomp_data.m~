@@ -1,0 +1,40 @@
+classdef chomp_data
+  %CHOMP_DATA Store image stacks in a custom binary format with given
+  %read-write functions
+  
+  properties
+    Source %Source location of the binary file
+  end
+  
+  methods
+    %Get array size
+    function szData = size(obj)
+      fid = fopen(obj.Source,'r');
+      dims = fread(fid, 1, 'double');
+      szData = fread(fid,uint16(dims),'double')';
+      fclose(fid);
+    end
+    
+    function varargout = subsref(obj, subs)
+      assert(strcmp(subs(1).type, '()'),'Wrong chomp_data subsref')
+      assert(numel(subs(1).subs==numel(size(obj.data)),'Wrong chomp_data subsref #dims');
+      szData = size(obj);
+      if strcmp(subs(1).subs(3),':')
+        frames = 1:szData(3);
+      else
+        frames = 
+      if subs(1).subs(1)=':' && subs(1).subs(2)=':'
+        %Getting full frames
+        
+      if strcmp(subs(1).type, '()')
+          if length(subs) > 1
+              [varargout{1:nargout}] = builtin('subsref', obj.data, subs(2:end));
+          else
+              [varargout{1:nargout}] = obj.data(subs(1).subs{:});
+          end
+      end
+end
+  end
+  
+end
+

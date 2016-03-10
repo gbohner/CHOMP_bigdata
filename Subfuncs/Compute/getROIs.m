@@ -2,8 +2,8 @@ function [ ROI_image, ROIs ] = getROIs( opt, varargin )
 %GETROIS Summary of this function goes here
 %   Detailed explanation goes here
 
-load(get_path(opt, 'output_iter', opt.niter), 'results');
- [H, W, X, y_orig, y] = results.get_fields( 'H', 'W', 'X', 'y_orig','y');
+load(get_path(opt, 'output_iter', opt.niter), 'model');
+ [H, W, X, y_orig, y] = model.get_fields( 'H', 'W', 'X', 'y_orig','y');
 
 %update_visualize( y_orig,H,reshape(W,opt.m,opt.m,size(W,2)),opt,1);
 

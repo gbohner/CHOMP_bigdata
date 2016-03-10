@@ -5,12 +5,13 @@ function [W] = update_dict(data,H,W,opt,nIter)
 % original space, via the locations
 
 
-patches = pick_patches(data,H,opt,1);
-
 switch opt.learn_decomp
+  case 'LMSVD'
+    %TODO
   case 'MTF'
-    
+    %TODO Maybe 
   case 'HOSVD'
+    patches = pick_patches(data,H,opt,1);
     patches = flatten_patches(patches);
     [U, Sv] = svd(patches,'econ');    
   otherwise %raise error

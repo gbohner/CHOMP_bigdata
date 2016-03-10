@@ -6,39 +6,21 @@ function Model_learn( opt)
 
 load(get_path(opt), 'inp'); %could load opt as well, but it may have changed
 inp.opt = struct_merge(inp.opt, opt);
-% 
-% if inp.opt.init_iter
-%   load(get_path(inp.opt,'output_iter',inp.opt.init_iter) ,'model')
-%   if inp.opt.init_iter < inp.opt.niter && inp.opt.learn
-%       %Update the dictionary (the W filters)
-%       fprintf('Iteration %d/%d, updating dictionary...\n', inp.opt.init_iter, inp.opt.niter);
-%       [W] = update_dict(inp.data,model.H,model.W,inp.opt,inp.opt.init_iter+2);
-%   elseif ~isempty(inp.opt.init_W)
-%     W = inp.opt.init_W;
-%   else
-%     W = model.W;
-%   end
-% else
-%   W  = Model_initialize(inp.opt);
-% end
 
-%TODO just doing this for compatibility once, then remove and uncomment
-%above
 if inp.opt.init_iter
-  load(get_path(inp.opt,'output_iter',inp.opt.init_iter) ,'results')
+  load(get_path(inp.opt,'output_iter',inp.opt.init_iter) ,'model')
   if inp.opt.init_iter < inp.opt.niter && inp.opt.learn
       %Update the dictionary (the W filters)
       fprintf('Iteration %d/%d, updating dictionary...\n', inp.opt.init_iter, inp.opt.niter);
-      [W] = update_dict(inp.data,results.H,results.W,inp.opt,inp.opt.init_iter+2);
+      [W] = update_dict(inp.data,model.H,model.W,inp.opt,inp.opt.init_iter+2);
   elseif ~isempty(inp.opt.init_W)
     W = inp.opt.init_W;
   else
-    W = results.W;
+    W = model.W;
   end
 else
   W  = Model_initialize(inp.opt);
 end
-
 
 
 tic;

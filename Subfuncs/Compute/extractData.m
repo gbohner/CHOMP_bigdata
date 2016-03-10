@@ -81,18 +81,18 @@ else %Handle the data loading-preprocessing-saving
     %Store the file links to the raw data
     data.raw = datastore(strcat(filepath, {allfiles.name}),'FileExtension','.tif','Type', 'image');
     raw_stack_done = 0; if exist(get_path(opt,'raw_virtual_stack'),'file'), raw_stack_done = 1; end;
-    if raw_stack_done, data.raw_stack = matfile(get_path(opt,'raw_virtual_stack')); 
+    if raw_stack_done, data.raw_stack.Y = chomp_data(get_path(opt,'raw_virtual_stack')); 
     else
-      Y = repmat(double(imread([filepath allfiles(1).name])),[1,1,2]);
-      save(get_path(opt,'raw_virtual_stack'), 'Y','-v7.3');
-      data.raw_stack = matfile(get_path(opt,'raw_virtual_stack'),'Writable',true);
+      data.raw_stack.Y = chomp_data(get_path(opt,'raw_virtual_stack'), double(imread([filepath allfiles(1).name])));
     end
     %Save the preprocessed stack
     data.proc_stack.Y = zeros([sz(1), sz(2), T]); % Image stack
-    for i2 = 1:T
+    im_cur = double(imread([filepath allfiles(1).name]));
+    data.proc_stack.Y(:, :,1) = imresize(im_cur,opt.spatial_scale,'bicubic');
+    for i2 = 2:T
       im_cur = double(imread([filepath allfiles(i2).name]));
       data.proc_stack.Y(:, :,i2) = imresize(im_cur,opt.spatial_scale,'bicubic');
-      if ~raw_stack_done, data.raw_stack.Y(:,:,i2) = im_cur; end
+      if ~raw_stack_done, append(data.raw_stack.Y, im_cur); end
     end
     
   elseif strcmp(opt.data_type, 'json')
@@ -122,10 +122,6 @@ else %Handle the data loading-preprocessing-saving
       end
       data.raw = matfile(data_path);
   elseif strcmp(opt.data_type, 'frames_virtual')
-      stack_path = get_path(opt, 'virtual_stack');
-      Y = [];
-      save(stack_path,'Y','-v7.3');
-      data.proc_stack = matfile(stack_path,'Writable',true);
       filepath = [fileparts(data_path) filesep];
       allfiles = dir([filepath '*' opt.src_string '*']);
       T = size(allfiles,1);
@@ -133,22 +129,24 @@ else %Handle the data loading-preprocessing-saving
       %Store the file links to the raw data
       data.raw = datastore(strcat(filepath, {allfiles.name}),'FileExtension','.tif','Type', 'image');
       raw_stack_done = 0; if exist(get_path(opt,'raw_virtual_stack'),'file'), raw_stack_done = 1; end;
-      if raw_stack_done, data.raw_stack = matfile(get_path(opt,'raw_virtual_stack')); 
+      if raw_stack_done, data.raw_stack.Y = chomp_data(get_path(opt,'raw_virtual_stack')); 
       else
-        Y = repmat(double(imread([filepath allfiles(1).name])),[1,1,2]);
-        save(get_path(opt,'raw_virtual_stack'), 'Y','-v7.3');
-        data.raw_stack = matfile(get_path(opt,'raw_virtual_stack'),'Writable',true);
+        data.raw_stack.Y = chomp_data(get_path(opt,'raw_virtual_stack'), double(imread([filepath allfiles(1).name])));
       end
-      data.proc_stack.Y = zeros([sz(1), sz(2), 2]); % Image stack
+      
       Ytmp = zeros([sz(1:2),100]);
       %Minibatch read and dump to the matfile variable
       s2 = 0;
       for i2 = 1:T
         im_cur = double(imread([filepath allfiles(i2).name]));
-        if ~raw_stack_done, data.raw_stack.Y(:,:,i2) = im_cur; end
+        if ~raw_stack_done && i2>1, append(data.raw_stack.Y, im_cur); end
         Ytmp(:,:,mod(i2,100)+floor(i2/100)*100) = imresize(im_cur,opt.spatial_scale,'bicubic');
         if (mod(i2,100) == 0) || (i2 == T)
-          data.proc_stack.Y(:, :,((s2*100)+1):min(((s2+1)*100),T)) = Ytmp(:,:,1:(mod(min(((s2+1)*100),T)-1,100)+1));
+          if s2==0
+            data.proc_stack.Y = chomp_data(get_path(opt,'virtual_stack'),Ytmp(:,:,1:(mod(min(((s2+1)*100),T)-1,100)+1)));
+          else
+            append(data.proc_stack.Y, Ytmp(:,:,1:(mod(min(((s2+1)*100),T)-1,100)+1)));
+          end
           s2 = s2+1;
           disp(s2)
         end
@@ -156,12 +154,14 @@ else %Handle the data loading-preprocessing-saving
   end % data reading
   
   %Downsample in time (average in subsequent time windows)
+  szProc = chomp_size(data.proc_stack,'Y');
+  tmp = zeros([szProc(1:2),floor(T *opt.time_scale)]); %TODO make as temporary file maybe
   if opt.time_scale < 1
     T = floor(T *opt.time_scale);
-    for i2 = 1:T
-      data.proc_stack.Y(:,:,i2) = mean(data.proc_stack.Y(:,:,ceil((i2-1)/opt.time_scale)+1:floor(i2/opt.time_scale)),3); %TODO - do this parallel?
+    parfor i2 = 1:T
+      tmp(:,:,i2) = mean(data.proc_stack.Y(:,:,ceil((i2-1)/opt.time_scale)+1:floor(i2/opt.time_scale)),3); %TODO - do this parallel?
     end
-    data.proc_stack.Y = data.proc_stack.Y(:,:,1:T);
+    data.proc_stack.Y = chomp_data(data.proc_stack.Y.Source,tmp);
   end
   
   %Get mean image of the raw data
@@ -201,13 +201,19 @@ else %Handle the data loading-preprocessing-saving
   
   %Apply whitening to the whole stack (whitening with respect to the
   %smoothing filter sizes set, not on a pixel-by-pixel level!)
+  tmp = zeros(chomp_size(data.proc_stack,'Y')); %TODO
   if opt.whiten
-      for t1 = 1:T
-       data.proc_stack.Y(:,:,t1) = squeeze(data.proc_stack.Y(:,:,t1)-opt.A) ./ (opt.B.^0.5);
+      parfor t1 = 1:T
+        tmp(:,:,t1) = squeeze(data.proc_stack.Y(:,:,t1)-opt.A) ./ (opt.B.^0.5);
       end
   end
+  data.proc_stack.Y = chomp_data(data.proc_stack.Y.Source,tmp);
   
-  
+  %make virtual stacks read-only
+  data.raw_stack = matfile(data.raw_stack.Properties.Source, 'Writable',false); 
+  if isa(data.proc_stack, 'matlab.io.MatFile')
+    data.proc_stack = matfile(data.proc_stack.Properties.Source, 'Writable',false);
+  end
   inp = chomp_input(opt,data, y, y_orig,V); %The input class that stores raw and preproc data
   
   

@@ -15,7 +15,7 @@ classdef chomp_model
   end
   
   methods
-    function obj = chomp_results(opt,W,H,X,L,y,y_orig,V)
+    function obj = chomp_model(opt,W,H,X,L,y,y_orig,V)
       obj.opt = opt;
       obj.W = W;
       obj.H = H;

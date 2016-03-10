@@ -15,17 +15,16 @@ end
 
 py = {};
 
+patches = get_patch(data.proc_stack, opt, H);
+
 %Pick the patches
 for h1 = 1:size(H,1)
-  [row,col,~] = ind2sub(szY,H(h1));
-  curpy = get_n_order_patch(data, row,col);
+  curpy = get_n_order_patch(patches(:,:,:,h1));
   py{end+1} = curpy;
 end
 
-  function patch_out = get_n_order_patch(data,row,col)    
-     %Compute the corresponding patch tensors from Y
-    patch = get_patch_time_block( data, row,col, opt.m );
-    patch = reshape(num2cell(reshape(patch,opt.m^2,[]),1),szY(end),1);
+  function patch_out = get_n_order_patch(patch_block)    
+    patch = reshape(num2cell(reshape(patch_block,opt.m^2,[]),1),szY(end),1);
     patch = repmat(patch,[1,opt.mom]); %T * moments cell
     patch_out = cell(1,opt.mom);
     for mom = 1:opt.mom

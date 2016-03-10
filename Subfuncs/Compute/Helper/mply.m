@@ -1,5 +1,5 @@
 function C = mply( A, B, dims )
-%MPLY A B are arbitrary matrices, with the last dimension of A and first
+%MPLY A B are arbitrary tensors, with the last dimension of A and first
 %dimension of B being the same
 %   With dims you can specify how many dimensions at the end of A do you
 %   want to merge with leading dimensions of B
@@ -68,6 +68,7 @@ end
 szC = size(C);
 if sum(szC==1)>0
   szCsqueeze = szC(szC~=1);
+  if numel(szCsqueeze)==1, szCsqueeze = [szCsqueeze,1]; end
   C = reshape(C,szCsqueeze);
 end
 

@@ -36,7 +36,7 @@ opt = chomp_options(...
 %opt.src_string = '*.tif';
 %opt.timestamp = '20160304T111735';
 
-opt.data_path = '/neurotank/Watkins/2016-02-13/2P/Exploratory/site002/Tseries_20160213-059/Tseries_20160213-059_Cycle00001_Ch2_000001.ome.tif';
+%opt.data_path = '/neurotank/Watkins/2016-02-13/2P/Exploratory/site002/Tseries_20160213-059/Tseries_20160213-059_Cycle00001_Ch2_000001.ome.tif';
 %opt.data_path = '/neurotank/Watkins/2016-02-19/2P/CenterOutReach/site002/Tseries_20160219_Watkins_CenterOutReach_time20160219.133302.428-001/Tseries_20160219_Watkins_CenterOutReach_time20160219.133302.428-001_Cycle00001_Ch2_000001.ome.tif';
  %opt.data_path = '/mnt/stanford/neurotank/Watkins/2016-02-19/2P/CenterOutReach/site002/Tseries_20160219_Watkins_CenterOutReach_time20160219.133302.428-001/Tseries_20160219_Watkins_CenterOutReach_time20160219.133302.428-001_Cycle00001_Ch2_000001.ome.tif';
  
