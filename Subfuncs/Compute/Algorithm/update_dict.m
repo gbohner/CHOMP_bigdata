@@ -7,9 +7,11 @@ function [W] = update_dict(data,H,W,opt,nIter)
 
 switch opt.learn_decomp
   case 'LMSVD'
-    %TODO
+    patches = pick_patches(data,H,opt,1);
+    patches = flatten_patches(patches);
+    [U, Sv] = lmsvd(patches,'econ');  
   case 'MTF'
-    %TODO Maybe 
+    %TODO Maybe sometime later
   case 'HOSVD'
     patches = pick_patches(data,H,opt,1);
     patches = flatten_patches(patches);

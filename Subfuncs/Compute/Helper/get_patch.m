@@ -8,13 +8,18 @@ function out = get_patch( stack, opt, H, varargin )
 
 szY = chomp_size(stack,'Y');
 
-if nargin==3
-  times = 1:szY(end);
-else
-  times = varargin{1};
-end
+p = inputParser();
+p.addOptional('times',1:szY(end),@isnumeric);
+p.addParameter('scaled',0,@isnumeric);
+p.parse(varargin{:});
 
-szPatch = [opt.m, opt.m];
+
+if ~p.Results.scale
+  szPatch = [opt.m, opt.m];
+else
+  tmp = floor(opt.m./opt.spatial_scale)+1-mod(floor(opt.m./opt.spatial_scale),2);
+  szPatch = [tmp tmp];
+end
 
 %Initialize output array
 out = cell(numel(times),1);
@@ -25,6 +30,7 @@ for t = times %over frames required
   frame_t = stack.Y(:,:,t);
   for i1 = 1:numel(H)
     [row, col] = ind2sub(szY,H(i1));
+    if p.Results.scale, row = round(row./opt.spatial_scale); col = round(col./opt.spatial_scale); end
     [ valid_inds, cuts ] = mat_boundary(szY(1:2), row-floor(szPatch(1)/2):row+floor(szPatch(1)/2), col-floor(szPatch(1)/2):col+floor(szPatch(1)/2));
     out{t}(i1,1+cuts(1,1):end-cuts(1,2),1+cuts(2,1):end-cuts(2,2)) = frame_t(valid_inds{1},valid_inds{2});
   end

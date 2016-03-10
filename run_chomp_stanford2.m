@@ -52,8 +52,8 @@ opt.data_path = '/neurotank/Watkins/2016-02-12/2P/CenterOutReach/site005/Tseries
 % opt.precomputed_folder = '~/stanford/precomputed/';
 
 % Varius param settings
-opt.spatial_scale = 0.25;
-opt.m = 7;
+opt.spatial_scale = 1;
+opt.m = 23;
 %opt.spatial_push = @(grid_dist)logsig(0.5*grid_dist-floor((opt.m+3)/2-1)); %Should be change when opt.m is changed (%TODO automatically, perhaps with linking to the opt.m variable, symbolic matlab)
 opt.mom = 2;
 opt.data_type = 'frames_virtual';

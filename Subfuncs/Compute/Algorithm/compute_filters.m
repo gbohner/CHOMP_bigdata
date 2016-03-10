@@ -29,7 +29,10 @@ for filt = 1:size(W,2); %Different filters
   end
 end
 
-%TODO Convert the raw moment estimates into cumulant estimates
+%Convert the diagonal raw  moment estimates into diagonal cumulant
+%estimates %TODO: first compute the full non-diag raw moments, convert to
+%non-diag cumulants to estimate error coming from using diag versions
+WY = raw2cum(WY,4);
 
 
 WnormInv = zeros(size(W,2),size(W,2),opt.mom); % Inverse Interaction between basis functions

@@ -30,6 +30,7 @@ Mask(1:opt.m,:) = 0; Mask(end-opt.m:end,:) = 0; Mask(:, 1:opt.m) = 0; Mask(:, en
 Mask = double(Mask);
 
 
+dL_mom = zeros([size(WY,1),size(WY,2),opt.mom]);
 dL = zeros([size(WY,1),size(WY,2), Ntypes]); % delta log likelihood
 xk = zeros([size(WY,1),size(WY,2), size(W,2), opt.mom]); % Coefficients for the mean image filter reconstruction
 
@@ -56,13 +57,14 @@ for j = 1:opt.cells_per_image
       %Give relative weight to the moments based on how many elements
       %they involve
       dL_mom(:,:,mom) = - sum(WY(:,:,:,mom) .* xk(:,:,:,mom),3);
-      if mom>=2
-        dL_mom(:,:,mom) = dL_mom(:,:,mom)./abs(mean2(dL_mom(:,:,mom))); %normalize the moment-related discrepencies
-      end
-
+%       if mom>=2
+%         dL_mom(:,:,mom) = dL_mom(:,:,mom)./abs(mean2(dL_mom(:,:,mom))); %normalize the moment-related discrepencies
+%       end
+      dl_mom(:,:,mom) = reshape(zscore(reshape(dl_mom(:,:,mom),numel(dl_mom(:,:,mom)),1)),size(dl_mom(:,:,1)));
     end
 %     dL = - sum(sum(WY .* xk,3),4); % Add contribution from each map and each moment
-    dL = sum(dL_mom,3);
+    
+    dL = sum(dL_mom,3); %linear sum of individual zscored differences %TODO GMM version of "zscoring jointly"
 %     dL = dL_mom(:,:,4); % Make it kurtosis pursuit
 
 
