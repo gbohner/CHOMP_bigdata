@@ -85,7 +85,6 @@ classdef chomp_options < handle
         else
           error('CHOMP:chomp_options:bad_constructor','Wrong class constructor call for chomp_options');
         end
-        return;
       end
       
           

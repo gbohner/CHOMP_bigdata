@@ -9,7 +9,7 @@ if iscell(opts), opt=opts{1}; else opt = opts; end
 
 switch opt.learn_decomp
   case 'LMSVD'
-    patches = pick_patches(datas,Hs,opts,1);
+    patches = pick_patches(datas,Hs,opts);
     patches = flatten_patches(patches);
     [U, Sv] = lmsvd(patches,nIter);
   case 'MTF'

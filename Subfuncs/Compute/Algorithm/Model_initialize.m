@@ -1,13 +1,6 @@
 function [W,  Worig]  = Model_initialize( opt )
 %MODEL_INITIALIZE Initializes the basis function matrices
 %   Detailed explanation goes here
-
-  if ~isfield(opt, 'NSS')
-    opt.NSS = 1; % Number of object types
-  end
-  if ~isfield(opt, 'KS')
-    opt.KS = 4; % Dimensionality of space per object type
-  end
   
   W = zeros(opt.m^2, opt.NSS*opt.KS); % initialize basis functions
     % Initialize circles with reasonable size

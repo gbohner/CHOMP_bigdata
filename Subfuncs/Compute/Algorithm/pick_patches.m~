@@ -1,4 +1,4 @@
-function [out] = pick_patches( datas, Hs, opts)
+function [py] = pick_patches( datas, Hs, opts)
 %PICK_PATCHES Returns patches to learn from, Y is the data tensor, H are the spatial locations, type is cell type number
 
 %Make sure all the input are cell arrays (of possibly multiple datasets)
@@ -27,9 +27,7 @@ parfor c1 = 1:numel(datas)
 
 end
 
-%Concatanate the results into a 1D array of cell arrays
-out={};
-for c1 = 1:numel(py)
-out(end+1:end+numel(py{c1})) = py{1};
+%Concatanate the resuls
+py = {py{:}};
 
 end
