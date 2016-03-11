@@ -1,19 +1,21 @@
-function [W] = update_dict(data,H,W,opt,nIter)
+function [W] = update_dict(datas,Hs,W,opts,nIter)
 %UPDATE_DICT Summary of this function goes here
 %   Detailed explanation goes here
 % Use the mean image to find a reasonable backprojection of W to the
 % original space, via the locations
 
+if iscell(opts), opt=opts{1}; else opt = opts; end
+  
 
 switch opt.learn_decomp
   case 'LMSVD'
-    patches = pick_patches(data,H,opt,1);
+    patches = pick_patches(datas,Hs,opts,1);
     patches = flatten_patches(patches);
-    [U, Sv] = lmsvd(patches,'econ');  
+    [U, Sv] = lmsvd(patches,nIter);
   case 'MTF'
     %TODO Maybe sometime later
   case 'HOSVD'
-    patches = pick_patches(data,H,opt,1);
+    patches = pick_patches(datas,Hs,opts,1);
     patches = flatten_patches(patches);
     [U, Sv] = svd(patches,'econ');    
   otherwise %raise error

@@ -9,12 +9,15 @@ function out = get_patch( stack, opt, H, varargin )
 szY = chomp_size(stack,'Y');
 
 p = inputParser();
+p.addRequired('stack',@isstruct);
+p.addRequired('opt',@(x)isa(x,'chomp_options'));
+p.addRequired('H',@isnumeric);
 p.addOptional('times',1:szY(end),@isnumeric);
 p.addParameter('scaled',0,@isnumeric);
-p.parse(varargin{:});
+p.parse(stack,opt,H,varargin{:});
 
 
-if ~p.Results.scale
+if ~p.Results.scaled
   szPatch = [opt.m, opt.m];
 else
   tmp = floor(opt.m./opt.spatial_scale)+1-mod(floor(opt.m./opt.spatial_scale),2);
@@ -22,21 +25,21 @@ else
 end
 
 %Initialize output array
-out = cell(numel(times),1);
+out = cell(numel(p.Results.times),1);
 [out{:}]= deal(zeros([numel(H),szPatch]));
 
 
-for t = times %over frames required
+for t = p.Results.times %over frames required
   frame_t = stack.Y(:,:,t);
   for i1 = 1:numel(H)
     [row, col] = ind2sub(szY,H(i1));
-    if p.Results.scale, row = round(row./opt.spatial_scale); col = round(col./opt.spatial_scale); end
+    if p.Results.scaled, row = round(row./opt.spatial_scale); col = round(col./opt.spatial_scale); end
     [ valid_inds, cuts ] = mat_boundary(szY(1:2), row-floor(szPatch(1)/2):row+floor(szPatch(1)/2), col-floor(szPatch(1)/2):col+floor(szPatch(1)/2));
     out{t}(i1,1+cuts(1,1):end-cuts(1,2),1+cuts(2,1):end-cuts(2,2)) = frame_t(valid_inds{1},valid_inds{2});
   end
 end
 
-out = reshape(cell2mat(out),[numel(H),numel(times),szPatch]);
+out = reshape(cell2mat(out),[numel(H),numel(p.Results.times),szPatch]);
 out = permute(out, [3,4,2,1]); % Change to row x col x t x cell_num
 end
 

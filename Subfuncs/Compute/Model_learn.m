@@ -9,7 +9,7 @@ inp.opt = struct_merge(inp.opt, opt);
 
 if inp.opt.init_iter
   load(get_path(inp.opt,'output_iter',inp.opt.init_iter) ,'model')
-  if inp.opt.init_iter < inp.opt.niter && inp.opt.learn
+  if (inp.opt.init_iter+1)< inp.opt.niter && inp.opt.learn
       %Update the dictionary (the W filters)
       fprintf('Iteration %d/%d, updating dictionary...\n', inp.opt.init_iter, inp.opt.niter);
       [W] = update_dict(inp.data,model.H,model.W,inp.opt,inp.opt.init_iter+2);

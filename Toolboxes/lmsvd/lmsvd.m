@@ -43,8 +43,10 @@ function [U,S,V,Out] = lmsvd(A,r,opts)
 %     Written by Xin Liu, Yin Zhang and Zaiwen Wen. July, 2010.
 %     Revised: March, 2012.
 %     Revised:  June, 2014.
+%     Fixed missing opts giving error, March 2016, Gergo Bohner
 
 if nargin < 2; r = 6;  end
+if nargin < 3; opts = struct(); end
 [m,n] = check_matrix(A);
 if r > min(m,n)/2;
     warning(TooManySVSrequested,'r > min(m,n)/2');

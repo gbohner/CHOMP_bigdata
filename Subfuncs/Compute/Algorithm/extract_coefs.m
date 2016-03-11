@@ -60,7 +60,7 @@ for j = 1:opt.cells_per_image
 %       if mom>=2
 %         dL_mom(:,:,mom) = dL_mom(:,:,mom)./abs(mean2(dL_mom(:,:,mom))); %normalize the moment-related discrepencies
 %       end
-      dl_mom(:,:,mom) = reshape(zscore(reshape(dl_mom(:,:,mom),numel(dl_mom(:,:,mom)),1)),size(dl_mom(:,:,1)));
+      dL_mom(:,:,mom) = reshape(zscore(reshape(dL_mom(:,:,mom),numel(dL_mom(:,:,mom)),1)),size(dL_mom(:,:,1)));
     end
 %     dL = - sum(sum(WY .* xk,3),4); % Add contribution from each map and each moment
     
