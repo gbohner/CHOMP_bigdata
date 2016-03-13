@@ -1,3 +1,12 @@
 To use relative path names below an every-changing wokring directory, set "CHOMP_ROOT_FOLDER" enviromental variable to the directory you want to start from.
 Very useful during SSHFS mounting of external drives. The classes will detect the enviroment on-load, so you always have the correct data path no matter if you work
 directly on the remote server, or on the local computer.
+
+TODO:
+- random proj: 
+	easy but inefficient version: just implement a random proj tensor, that maps from z*z patches to d*d size of basis functions and just multiply W with the tensor before convolution: doesn’t make sense cause we’re still doing the z*z size convolution:
+	better version is to do the random proj, compute the cumulant estimates already in random proj space, and just store those estimate at every location.
+	Because we don’t have to store stuff in memory anymore, this works well.
+
+- Multiple object types:
+	This should be easy, we have to do the convolution anyway, compute WnormInv blockwise and also during the inference do the dL estimates block-wise

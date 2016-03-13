@@ -30,6 +30,9 @@ Mask(1:opt.m,:) = 0; Mask(end-opt.m:end,:) = 0; Mask(:, 1:opt.m) = 0; Mask(:, en
 Mask = double(Mask);
 %TODO: Maybe modify it such that mask is per object type
 
+%Get the object types blocks of W:
+
+
 
 dL_mom = zeros([size(WY,1),size(WY,2),Ntypes,opt.mom]);
 dL = zeros([size(WY,1),size(WY,2), Ntypes]); % delta log likelihood
@@ -58,7 +61,7 @@ for j = 1:opt.cells_per_image
       for mom = 1:opt.mom
         %Give relative weight to the moments based on how many elements
         %they involve
-        dL_mom(:,:,type,mom) = - sum(WY(:,:,opt.Wblocks{type},mom) .* xk(:,:,opt.Wblocks{type},mom),3);
+        dL_mom(:,:,type,mom) = - sum(WY(:,:,blocks{type},mom) .* xk(:,:,blocks{type},mom),3);
   %       if mom>=2
   %         dL_mom(:,:,mom) = dL_mom(:,:,mom)./abs(mean2(dL_mom(:,:,mom))); %normalize the moment-related discrepencies
   %       end
@@ -136,7 +139,7 @@ end
   
 
   H(j) = ind;
-  X(j,opt.Wblocks{type}) = reshape(xk(row,col,opt.Wblocks{type}),1,[]); %TODO, check if leaving a bunch of zeros in X is reasonable, or rather have it just be size of opt.KSS and choose the respective block of W later
+  X(j,blocks{type}) = reshape(xk(row,col,blocks{type}),1,[]); %TODO, check if leaving a bunch of zeros in X is reasonable, or rather have it just be size of opt.KSS and choose the respective block of W later
   L(j,:) = AbsMin;
   
  if opt.fig >2

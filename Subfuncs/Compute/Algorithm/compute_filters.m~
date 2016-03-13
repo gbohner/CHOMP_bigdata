@@ -32,36 +32,35 @@ end
 %Convert the diagonal raw  moment estimates into diagonal cumulant
 %estimates %TODO: first compute the full non-diag raw moments, convert to
 %non-diag cumulants to estimate error coming from using diag versions
-for type = 1:opt.NSS
-  WY(:,:,:,opt.Wblocks{type}) = raw2cum(WY(:,:,:,opt.Wblocks{type}),4);
+for types = 1:opt.NSS
+  WY(:,:,:,((types-1)*opt.KS+1):(types*opt.KS)) = raw2cum(WY(:,:,:,((types-1)*opt.KS+1):(types*opt.KS)),4);
 end
 
 
 WnormInv = zeros(size(W,2),size(W,2),opt.mom); % Inverse Interaction between basis functions
 
 %WnormInv should be in feature space (when doing random projection version)
-for type = 1:opt.NSS
+for types = 1:opt.NSS
   for filt1 = 1:opt.KS
     for filt2 = 1:opt.KS
-      Wcur1 = W(:,(type-1)*opt.KS+filt1);
-      Wcur2 = W(:,(type-1)*opt.KS+filt2);
+      Wcur1 = W(:,(types-1)*opt.KS+filt1);
+      Wcur2 = W(:,(types-1)*opt.KS+filt2);
       for mom = 1:opt.mom
-        if mom>1, Wcur1 = mply(Wcur1, W(:,(type-1)*opt.KS+filt1)',0); end
-        if mom>1, Wcur2 = mply(Wcur2, W(:,(type-1)*opt.KS+filt2)',0); end
+        if mom>1, Wcur1 = mply(Wcur1, W(:,(types-1)*opt.KS+filt1)',0); end
+        if mom>1, Wcur2 = mply(Wcur2, W(:,(types-1)*opt.KS+filt2)',0); end
         Wcur1 = Wcur1./norm(Wcur1(:)+1e-6); % make sure it has norm of 1.
         Wcur2 = Wcur2./norm(Wcur2(:)+1e-6); % make sure it has norm of 1.
 
-        WnormInv((type-1)*opt.KS+(type-1)*opt.KS+filt1,filt2,mom) = Wcur1(:)'*Wcur2(:); 
+        WnormInv((types-1)*opt.KS+(types-1)*opt.KS+filt1,filt2,mom) = Wcur1(:)'*Wcur2(:); 
       end
     end
   end
 end
 
-%Invert Wnorm blockwise / obj type
+%Invert Wnorm blockwise 
 for mom = 1:opt.mom
-  for type = 1:opt.NSS
-    WnormInv(opt.Wblocks{type},opt.Wblocks{type},mom) = ...
-      inv(WnormInv(opt.Wblocks{type},opt.Wblocks{type},mom)+eye(numel(opt.Wblocks{type}))); % Regularized
+  for types = 1:opt.NS
+    WnormInv(:,:,mom) = inv(WnormInv(:,:,mom)+eye(size(WnormInv,1),size(WnormInv,2))); % Regularized
   end 
 end
 

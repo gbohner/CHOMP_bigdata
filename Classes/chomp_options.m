@@ -67,6 +67,10 @@ classdef chomp_options < handle
      
   end
   
+  properties (Dependent)
+    Wblocks
+  end
+  
   methods
     function obj = chomp_options(varargin)
       %Object constructor
@@ -113,6 +117,12 @@ classdef chomp_options < handle
       end
     end
 
+    function blocks = get.Wblocks(obj)
+      blocks = cell(opt.NSS, 1);
+      for type = 1:obj.NSS
+        blocks{type} = ((type-1)*obj.KS+1):(type*obj.KS);
+      end
+    end
   end
   
   

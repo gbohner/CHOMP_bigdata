@@ -7,7 +7,10 @@ addpath('/mnt/stanford/home/djoshea/code/rig1/analysis/djoshea')
 addpath('/mnt/stanford/home/djoshea/code/rig1/analysis/djoshea/utils')
 import Regress.plotTuningColorGuide
 
+%load('/mnt/stanford/neurotank/derived/gbohner/input/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-021_Cycle00001_Ch2_000001.ome_20160310T175537.mat')
+%load('/mnt/stanford/neurotank/derived/gbohner/input/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-024_Cycle00001_Ch2_000001.ome_20160310T175715.mat')
 load('/mnt/stanford/neurotank/derived/gbohner/input/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-021_Cycle00001_Ch2_000001.ome_20160310T134413.mat')
+inp.opt.niter = 4;
 data = inp.data;
 load(get_path(inp.opt,'output_iter',inp.opt.niter),'model');
 [H, W, X, y_orig, y] = model.get_fields( 'H', 'W', 'X', 'y_orig','y');
@@ -62,9 +65,9 @@ end
 
 %% Getting timeseries from ROIs
 szY = chomp_size(data.raw_stack, 'Y');
-%timeseries = zeros(numel(H), szY(3));
+timeseries = zeros(numel(H), szY(3));
 
-patches = get_patch(data.raw_stack,opt,H,1:szY(3));
+patches = get_patch(data.raw_stack,opt,H,1:szY(3),'scaled',1);
 
 for i1 = 1:numel(H)
   timeseries(i1,:) = mply(ROIs{i1}.mask, patches(:,:,:,i1),2);
@@ -79,7 +82,7 @@ end
 %% Just plotting
 
 figure; 
-to_plot = [1:20];%[15:20];%[10:15]+30;
+to_plot = [1:30];%[15:20];%[10:15]+30;
 v = max(std(timeseries(to_plot,:),1))*2;
 for i1 = to_plot
   plot(timeseries(i1,:) + numel(to_plot)*v - i1*v, 'LineWidth', 2); hold on;
