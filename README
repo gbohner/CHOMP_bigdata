@@ -6,7 +6,4 @@ TODO:
 - random proj: 
 	easy but inefficient version: just implement a random proj tensor, that maps from z*z patches to d*d size of basis functions and just multiply W with the tensor before convolution: doesn’t make sense cause we’re still doing the z*z size convolution:
 	better version is to do the random proj, compute the cumulant estimates already in random proj space, and just store those estimate at every location.
-	Because we don’t have to store stuff in memory anymore, this works well.
-
-- Multiple object types:
-	This should be easy, we have to do the convolution anyway, compute WnormInv blockwise and also during the inference do the dL estimates block-wise
+	Because we dont have to store stuff in memory anymore, this would work well.

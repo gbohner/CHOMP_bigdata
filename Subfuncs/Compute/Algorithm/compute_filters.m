@@ -33,7 +33,7 @@ end
 %estimates %TODO: first compute the full non-diag raw moments, convert to
 %non-diag cumulants to estimate error coming from using diag versions
 for type = 1:opt.NSS
-  WY(:,:,:,opt.Wblocks{type}) = raw2cum(WY(:,:,:,opt.Wblocks{type}),4);
+  WY(:,:,opt.Wblocks{type},:) = raw2cum(WY(:,:,opt.Wblocks{type},:),4);
 end
 
 
@@ -56,6 +56,8 @@ for type = 1:opt.NSS
     end
   end
 end
+
+%TODO: Something is wrong with reconstructions
 
 %Invert Wnorm blockwise / obj type
 for mom = 1:opt.mom

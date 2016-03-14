@@ -1,16 +1,17 @@
 %%Loading stuff
-close all;
-addpath('/mnt/stanford/home/djoshea/code/rig1/analysis/djoshea')
-addpath('/mnt/stanford/home/djoshea/code/rig1/analysis/djoshea/utils')
-import Regress.plotTuningColorGuide
+% close all;
+% %Load Dan's plotting tools if on neurofast
+% addpath('/home/djoshea/code/rig1/analysis/djoshea')
+% addpath('/home/djoshea/code/rig1/analysis/djoshea/utils')
+% import Regress.plotTuningColorGuide
 
 %Current time series
-load('cur_time_series', 'timeseries');
+load(get_path(opt,'results'),'timeseries','ROIs','ROI_mask','opt');
 timeseries_correct = timeseries';
 %load('cur_time_series_rand', 'timeseries');
 %timeseries_random = zscore(timeseries',[],1);
 %Regression data
-load('/mnt/stanford/neurotank/derived/Watkins/2016-02-12/2P_regression/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-021/regressHandData.mat');
+load('/neurotank/derived/Watkins/2016-02-12/2P_regression/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-021/regressHandData.mat');
 
 szY = chomp_size(inp.data.raw_stack,'Y');
 
@@ -114,7 +115,7 @@ subplottight(2, 1, 1);
 imagesc(out_im);
 axes('Position', [0.85 0.85 0.15 0.15]);
 plotTuningColorGuide();
-print(gcf,'ROI_colors_map.png','-dpng')
+%print(gcf,'ROI_colors_map.png','-dpng')
 
 
 
@@ -129,4 +130,4 @@ hsvList = [(dir_pred_pix'+pi)/(2*pi), repmat(0.5, numel(dir_pred_pix), 1), mat2g
 rgbList = hsv2rgb(hsvList);
 rgb = reshape(rgbList, szY(1), szY(2), 3);
 figure; imagesc(rgb); axis image
-imwrite(rgb, 'pixelwise_image.png');
+%imwrite(rgb, 'pixelwise_image.png');

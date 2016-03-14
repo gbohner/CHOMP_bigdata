@@ -41,9 +41,11 @@ switch opt.ROI_type
 end
 
 for i1 = 1:num_reconst
-  [row,col,t] = ind2sub(sz,H(i1));
-  reconst = reshape(W(:,1:opt.KS)*(X(i1, 1:opt.KS)'), opt.m, opt.m);
+  [row,col,type] = ind2sub(sz,H(i1));
+  reconst = reshape(W(:,opt.Wblocks{type})*(X(i1, opt.Wblocks{type})'), opt.m, opt.m);
   reconst = imrotate(reconst, 180);
+  
+  figure; imagesc(reconst); pause
   
   switch opt.ROI_type
     case 'quantile'

@@ -4,13 +4,16 @@ clear all;
 cd(fileparts(mfilename('fullpath')));
 addpath('./Classes')
 
+setenv('CHOMP_ROOT_FOLDER', '');
+
 opt = chomp_options(...
     'root_folder', getenv('CHOMP_ROOT_FOLDER'), ...
     'input_folder', '/neurotank/derived/gbohner/input/', ...
     'output_folder', '/neurotank/derived/gbohner/output/', ...
     'precomputed_folder', '/neurotank/derived/gbohner/precomputed/', ...
-    'data_type', 'frames', ...
-    'init_model','filled', ...
+    'results_folder', '/neurotank/derived/gbohner/results', ...
+    'data_type', 'frames_virtual', ...
+    'init_model',{'filled'}, ...
     'stabilize', 1, ...
     'niter', 4, ...
     'm', 17, ...
@@ -27,7 +30,7 @@ opt = chomp_options(...
 
 
 %For this one no tif images yet, in progress
-opt.data_path = '/neurotank/Watkins/2016-02-12/2P/CenterOutReach/site005/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-021/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-021_Cycle00001_Ch2_000001.ome.tif';
+%opt.data_path = '/neurotank/Watkins/2016-02-12/2P/CenterOutReach/site005/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-021/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-021_Cycle00001_Ch2_000001.ome.tif';
 
 % opt.data_path = '/neurotank/derived/Watkins/2016-02-12/2P_stabilized/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-021/image_00001.tif';
 % opt.src_string = '*.tif';
@@ -44,19 +47,25 @@ opt.data_path = '/neurotank/Watkins/2016-02-12/2P/CenterOutReach/site005/Tseries
  %opt.data_path = '/mnt/stanford/neurotank/Watkins/2016-02-19/2P/CenterOutReach/site002/Tseries_20160219_Watkins_CenterOutReach_time20160219.133302.428-001/Tseries_20160219_Watkins_CenterOutReach_time20160219.133302.428-001_Cycle00001_Ch2_000001.ome.tif';
  
 % % For local run and local data 
- %opt.data_path = '/stanford/Tseries_20160219_Watkins_CenterOutReach_time20160219.133302.428-001/Tseries_20160219_Watkins_CenterOutReach_time20160219.133302.428-001_Cycle00001_Ch2_000001.ome.tif';
- 
- 
-% opt.input_folder = '~/stanford/input/';
-% opt.output_folder = '~/stanford/output/';
-% opt.precomputed_folder = '~/stanford/precomputed/';
+ opt.data_path = '~/stanford/Tseries_20160219_Watkins_CenterOutReach_time20160219.133302.428-001/Tseries_20160219_Watkins_CenterOutReach_time20160219.133302.428-001_Cycle00001_Ch2_000001.ome.tif';
+opt.input_folder = '~/stanford/input/';
+opt.output_folder = '~/stanford/output/';
+opt.precomputed_folder = '~/stanford/precomputed/';
+
+opt.timestamp = '20160313T171700';
+
+opt.stabilize = 0;
 
 % Varius param settings
 opt.spatial_scale = 1;
-opt.m = 23;
+opt.m = 17;
 %opt.spatial_push = @(grid_dist)logsig(0.5*grid_dist-floor((opt.m+3)/2-1)); %Should be change when opt.m is changed (%TODO automatically, perhaps with linking to the opt.m variable, symbolic matlab)
 opt.mom = 2;
 opt.data_type = 'frames_virtual';
+opt.init_model = {'filled', 'pointlike'}; % 'filled', 'donut', 'pointlike', \\ %TODO: 'supervised', 'multi'
+opt.NSS = 2;
+opt.KS = 4;
+opt.cells_per_image = 50;
  
 [~, opt.file_prefix] = fileparts(opt.data_path);
 

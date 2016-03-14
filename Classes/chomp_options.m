@@ -7,19 +7,21 @@ classdef chomp_options < handle
   end
   
   properties
+    %Setup folder structure
      code_path = [fileparts(mfilename('fullpath')) filesep]; %Package directory
      data_path = 'default_path'; %Input data file (stack, or initial frame)
      input_folder = './tmp/input/'; %Store preprocessed input data, if you change it, use full path
      output_folder = './tmp/output/'; %Output folder, if you change it, use full path
      precomputed_folder = './tmp/precomputed/'; % Stores precomputed tensors
+     results_folder = './tmp/results/'; %Store the extracted ROIs and timeseries
      file_prefix = 'test'; %Prefix for file names
  
      % Model setup
      m = 17; % Basis function size in pixels
-     NSS = 1; % Number of object types
-     KS = 8; % Dimensionality of space per object type (i.e. number of basis functions per object type)
-     init_model = 'filled'; % 'filled', 'donut', 'pointlike', \\ %TODO: 'supervised', 'multi'
-     init_W = [];
+     NSS = 2; % Number of object types
+     KS = 4; % Dimensionality of space per object type (i.e. number of basis functions per object type)
+     init_model = {'filled', 'pointlike'}; % 'filled', 'donut', 'pointlike', \\ %TODO: 'supervised', 'multi'
+     init_W = {[],[]};
 
      % Data extraction and preprocessing
      stabilize = 1;
@@ -42,11 +44,7 @@ classdef chomp_options < handle
      init_iter = 0; %Set the initial iteration. If not 0, search for the file with appropriate name
       %     relweight = 10; % weighting between importance of covariance / mean (automatically set to 'optimal' value in Shared_main/extract_coefs.m)
      fig = 0; %Whether to visualize or not during learning
-     ex = 1; % what example image to display during training
-     cells_per_image = 20; % a rough estimate of the average number of cells per image
-     relweight = 1; %Relative weight between mean and correlation coeff.
-     MP      = 0; % somewhat redundant: if set to 1 always uses one subspace per object
-     inc     = 2; % every      inc iterations estimate a new subspace
+     cells_per_image = 50; % the maximum number of objects to infer
      warmup = 1;
      learn   = 1; % do learning?
      spatial_push % = @(grid_dist)logsig(0.5*grid_dist-floor(options.m/2-1)); % Specified distance based function (leave as [] if not desired)
@@ -62,7 +60,7 @@ classdef chomp_options < handle
      
      cleanup = 0;
 
-     timestamp % Timestamping every operation
+     timestamp % Timestamping
      
      
   end
@@ -101,10 +99,21 @@ classdef chomp_options < handle
       
       %Compute the derived properties
       obj = obj.derive_from_m(); 
+      
+      obj = obj.assert();
+    end
+    
+    function obj = assert(obj)
+      %Check for specific parameters to be in the correct format;
+      if ~iscell(obj.init_model), obj.init_model = {obj.init_model}; end
+      if ~iscell(obj.init_W), obj.init_W = {obj.init_W}; end
+      assert(numel(obj.init_model)==obj.NSS, 'CHOMP: Object type # discrepency');
     end
     
     
     function obj = derive_from_m(obj)
+      %On construct, makes sure that certain properties are set correctly
+      %in relation to basis function (i.e. expected cell) size
       obj.smooth_filter_mean = obj.m;
       obj.smooth_filter_var = obj.m;
       obj.spatial_push = @(grid_dist)logsig(0.5*grid_dist-floor(obj.m/2-1)); %@(grid_dist, sharp)logsig(sharp*grid_dist-floor(sharp*2*obj.m/2-1));
@@ -118,10 +127,15 @@ classdef chomp_options < handle
     end
 
     function blocks = get.Wblocks(obj)
-      blocks = cell(opt.NSS, 1);
+      blocks = cell(obj.NSS, 1);
       for type = 1:obj.NSS
         blocks{type} = ((type-1)*obj.KS+1):(type*obj.KS);
       end
+    end
+    
+    function set.Wblocks(obj, val)
+      %Just to suppress errors coming from no set method, it doesn't do
+      %anything.
     end
   end
   

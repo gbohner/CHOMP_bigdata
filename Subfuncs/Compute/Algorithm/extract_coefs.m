@@ -136,7 +136,9 @@ end
   
 
   H(j) = ind;
-  X(j,opt.Wblocks{type}) = reshape(xk(row,col,opt.Wblocks{type}),1,[]); %TODO, check if leaving a bunch of zeros in X is reasonable, or rather have it just be size of opt.KSS and choose the respective block of W later
+  for mom = 1:opt.mom
+    X(j,(mom-1)*size(W,2)+opt.Wblocks{type}) = reshape(xk(row,col,(mom-1)*size(W,2)+opt.Wblocks{type}),1,[]); %TODO, check if leaving a bunch of zeros in X is reasonable, or rather have it just be size of opt.KSS and choose the respective block of W later
+  end
   L(j,:) = AbsMin;
   
  if opt.fig >2

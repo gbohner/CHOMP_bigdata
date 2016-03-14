@@ -1,4 +1,4 @@
-function [out] = pick_patches( datas, Hs, opts)
+function [out] = pick_patches( datas, Hs, opts,type)
 %PICK_PATCHES Returns patches to learn from, Y is the data tensor, H are the spatial locations, type is cell type number
 
 %Make sure all the input are cell arrays (of possibly multiple datasets)
@@ -12,9 +12,20 @@ parfor c1 = 1:numel(datas)
   data = datas{c1};
   H = Hs{c1};
   opt = opts{c1};
-  py{c1} = cell(size(H,1),1);
   
   szY = chomp_size(data.proc_stack,'Y');
+  
+  %Remove entries from H that are the wrong type
+  h1 = 1;
+  while h1<=size(H,1)
+    [~,~,cur_type] = ind2sub([szY(1:2) opt.NSS],H(h1))
+    if cur_type ~= type, H(h1) = []; else h1 = h1+1; end
+  end
+  
+  
+  py{c1} = cell(size(H,1),1);
+  
+  
 
   patches = get_patch(data.proc_stack, opt, H);
 

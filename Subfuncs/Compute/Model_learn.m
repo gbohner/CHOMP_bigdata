@@ -55,7 +55,9 @@ for n = (inp.opt.init_iter+1):inp.opt.niter
     if n < inp.opt.niter && inp.opt.learn
       %Update the dictionary (the W filters)
       fprintf('Iteration %d/%d, updating dictionary...\n', n, inp.opt.niter);
-      [W] = update_dict(inp.data,model.H,model.W,inp.opt,n+2);
+      for type = 1:inp.opt.NSS
+        W(:,inp.opt.Wblocks{type}) = update_dict(inp.data,model.H,model.W(:,inp.opt.Wblocks{type}),inp.opt,n+2,type);
+      end
     end
     
    

@@ -20,6 +20,8 @@ else
       else %return frame to write to
         output = [opt.input_folder opt.file_prefix '_stabilized' filesep opt.file_prefix '_stabilized_' sprintf('%.5d',uint16(varargin{2})) '.tif'];
       end
+    case 'results'
+      output = [opt.results_folder opt.file_prefix '_' opt.timestamp '_results.mat'];
     otherwise
        error('CHOMP:util:nopath', 'The type of path you want get_path() to return is not implemented');
   end

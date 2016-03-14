@@ -1,21 +1,21 @@
 %% Loading
+%Add Dan's plotting tools if on neurofast
+% addpath('/home/djoshea/code/rig1/analysis/djoshea')
+% addpath('/home/djoshea/code/rig1/analysis/djoshea/utils')
+% import Regress.plotTuningColorGuide
+
+
 %Load the input file we wanna use (mostly manual for now)
-%load(get_path(opt),'inp'); 
-setenv('CHOMP_ROOT_FOLDER','/mnt/stanford')
-
-addpath('/mnt/stanford/home/djoshea/code/rig1/analysis/djoshea')
-addpath('/mnt/stanford/home/djoshea/code/rig1/analysis/djoshea/utils')
-import Regress.plotTuningColorGuide
-
-%load('/mnt/stanford/neurotank/derived/gbohner/input/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-021_Cycle00001_Ch2_000001.ome_20160310T175537.mat')
-%load('/mnt/stanford/neurotank/derived/gbohner/input/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-024_Cycle00001_Ch2_000001.ome_20160310T175715.mat')
-load('/mnt/stanford/neurotank/derived/gbohner/input/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-021_Cycle00001_Ch2_000001.ome_20160310T134413.mat')
-inp.opt.niter = 4;
-data = inp.data;
-load(get_path(inp.opt,'output_iter',inp.opt.niter),'model');
-[H, W, X, y_orig, y] = model.get_fields( 'H', 'W', 'X', 'y_orig','y');
-
-opt=inp.opt;
+if exist('opt','var'), load(get_path(opt),'inp'); end
+if exist('inp', 'var')
+  load(get_path(opt),'inp');
+  data = inp.data;
+  load(get_path(inp.opt,'output_iter',inp.opt.niter),'model');
+  [H, W, X, y_orig, y] = model.get_fields( 'H', 'W', 'X', 'y_orig','y');
+  opt=inp.opt;
+else
+  error('No data found to be used further');
+end
 
 
 
@@ -43,8 +43,9 @@ visboundaries(B)
 for i1 = 1:numel(ROIs)
   text(ROIs{i1}.col, ROIs{i1}.row, num2str(i1), 'Color','r','FontSize',20,'FontWeight','bold');
 end
-  set(gca, 'XTick', []);
-   set(gca, 'YTick', []);
+
+set(gca, 'XTick', []);
+set(gca, 'YTick', []);
 %    
 % subplottight(2, 1, 1);
 % imagesc(out_im); axis image
@@ -54,13 +55,13 @@ end
 % plotTuningColorGuide();
  
 pause(0.3);
-
-if getRandom
-  print(gcf,'cur_ROIs_rand.eps','-depsc2')
-else
-  print(gcf,'cur_ROIs.eps','-depsc2')
-  print(gcf,'cur_ROIs.png','-dpng')
-end
+% 
+% if getRandom
+%   print(gcf,'cur_ROIs_rand.eps','-depsc2')
+% else
+%   print(gcf,'cur_ROIs.eps','-depsc2')
+%   print(gcf,'cur_ROIs.png','-dpng')
+% end
 
 
 %% Getting timeseries from ROIs
@@ -73,11 +74,7 @@ for i1 = 1:numel(H)
   timeseries(i1,:) = mply(ROIs{i1}.mask, patches(:,:,:,i1),2);
 end
 
-if getRandom
-  save('cur_time_series_rand','timeseries','ROIs','ROI_mask');
-else
-  save('cur_time_series','timeseries','ROIs','ROI_mask');
-end
+save(get_path(opt,'results'),'timeseries','ROIs','ROI_mask');
 
 %% Just plotting
 
