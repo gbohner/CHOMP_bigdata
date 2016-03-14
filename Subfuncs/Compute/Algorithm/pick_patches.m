@@ -17,20 +17,21 @@ parfor c1 = 1:numel(datas)
   
   %Remove entries from H that are the wrong type
   h1 = 1;
-  while h1<=size(H,1)
+  while h1<=numel(H)
     [~,~,cur_type] = ind2sub([szY(1:2) opt.NSS],H(h1))
     if cur_type ~= type, H(h1) = []; else h1 = h1+1; end
   end
   
   
-  py{c1} = cell(size(H,1),1);
+  py{c1} = cell(numel(H),1);
   
   
-
-  patches = get_patch(data.proc_stack, opt, H);
+  if ~isempty(H)
+    patches = get_patch(data.proc_stack, opt, H);
+  end
 
   %Pick the patches
-  for h1 = 1:size(H,1)
+  for h1 = 1:numel(H)
     curpy = get_n_order_patch(patches(:,:,:,h1), opt, szY);
     py{c1}{h1} = curpy;
   end
@@ -41,6 +42,6 @@ end
 %Concatanate the results into a 1D array of cell arrays
 out={};
 for c1 = 1:numel(py)
-out(end+1:end+numel(py{c1})) = py{1};
+out(end+1:end+numel(py{c1})) = py{c1};
 
 end

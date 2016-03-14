@@ -7,16 +7,21 @@ function [W] = update_dict(datas,Hs,W,opts,k,type)
 if iscell(opts), opt=opts{1}; else opt = opts; end
   
 
+patches = pick_patches(datas,Hs,opts,type);
+
+if numel(patches) < k
+  warning(sprintf('Only %d of type %d objects have been found, returning the previous basis functions without learning', numel(patches), type));
+end
+
+patches = flatten_patches(patches);
+
+
 switch opt.learn_decomp
-  case 'LMSVD'
-    patches = pick_patches(datas,Hs,opts,type);
-    patches = flatten_patches(patches);
+  case 'LMSVD'    
     [U, Sv] = lmsvd(patches,k);
   case 'MTF'
     %TODO Maybe sometime later
   case 'HOSVD'
-    patches = pick_patches(datas,Hs,opts,type);
-    patches = flatten_patches(patches);
     [U, Sv] = svd(patches,'econ');    
   otherwise %raise error
     error('CHOMP:learning:dict_update', 'Dictionary update option string (opt.learn_decomp) does not correspond to implemented options.');
