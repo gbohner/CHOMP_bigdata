@@ -44,7 +44,7 @@ classdef chomp_options < handle
      init_iter = 0; %Set the initial iteration. If not 0, search for the file with appropriate name
       %     relweight = 10; % weighting between importance of covariance / mean (automatically set to 'optimal' value in Shared_main/extract_coefs.m)
      fig = 0; %Whether to visualize or not during learning
-     cells_per_image = 50; % the maximum number of objects to infer
+     cells_per_image = 30; % the maximum number of objects to infer
      warmup = 1;
      learn   = 1; % do learning?
      spatial_push % = @(grid_dist)logsig(0.5*grid_dist-floor(options.m/2-1)); % Specified distance based function (leave as [] if not desired)

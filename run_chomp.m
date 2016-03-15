@@ -23,7 +23,3 @@ opt.results_folder = '~/stanford/results/';
 [~, opt.file_prefix] = fileparts(opt.data_path); % Important if you want to have nice file prefixes (corresponding to folder name)
 [opt, ROI_mask, ROIs] = chomp(opt);
 get_cell_timeseries(opt);
-
-% load('../data_for_gergo/S1-T52844_masks.mat', 'donut')
-
-% figure(2); imshowpair(ROI_mask, donut>0);
