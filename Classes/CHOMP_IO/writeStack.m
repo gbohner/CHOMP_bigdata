@@ -10,9 +10,7 @@ function writeStack( path, data, varargin )
       % Columns x Rows x Frames (equivalent to Matlab fwrite(fid,
       % data(:),number_format) format);
       
-      number_format = 'uint16';
-      tmp = 1; tmp = cast(tmp,number_format); tmp = whos('tmp');
-      number_format_bytes = tmp.bytes;
+     
       
       %File format:
       p = inputParser();
@@ -20,36 +18,52 @@ function writeStack( path, data, varargin )
       p.addRequired('data',@isnumeric)
       p.addParameter('prefix','DEFAULT_PREFIX',@ischar)
       p.addParameter('timestamp',datestr(now, 30), @ischar)
-      p.addParameter('append',0,@(x)all([isnumeric(x),exist(path,'file')]));
+      p.addParameter('append',0,@(x)all([isnumeric(x),exist(path,'file')])); %Appends to the end of the file
       p.addParameter('overwrite_frame',0,@(x)all([isnumeric(x),exist(path,'file')])); %overwrite frame #overwrite_frame
+      p.addParameter('truncateToFrame',0,@(x)all([isnumeric(x),exist(path,'file')])); %
+      p.addParameter('number_format','double',@ischar);
       p.parse(path, data,varargin{:})
       
+      %Get the number format we are going to use
+      number_format = p.Results.number_format;
+      tmp = 1; tmp = cast(tmp,number_format); tmp = whos('tmp');
+      number_format_bytes = tmp.bytes;
+      
+      to_modify = any([p.Results.append, p.Results.overwrite_frame, p.Results.truncateToFrame]);
+      
       %Open the file at the given location
-      if p.Results.append || p.Results.overwrite_frame
-        fid = fopen(p.Results.path,'rb+');
+      if to_modify
+        fid = fopen(p.Results.path,'rb+');     
       else
         fid = fopen(p.Results.path,'w');
       end
       
       %Convert the data to required number format
-      p.Results.data = cast(p.Results.data,number_format);
+      data = cast(p.Results.data,number_format);
       
       %Write into the header [ndims(data), size(data)]
-      if p.Results.append
+      if to_modify
         %Get the size of already existing data
         frewind(fid);
         dims = fread(fid, 1, 'double');
         szData = fread(fid,uint16(dims),'double')';
-        assert(all(szData(1:2)==[size(p.Results.data,1),size(p.Results.data,2)]),'Dimension for appending are inconsistant');
-        headerSize = double([dims, szData(1:2), szData(3) + size(p.Results.data,3)]);
+        orig_number_format = strtrim(char(fread(fid,10,'char')'));
+        %Assert that dimensions and the number_format is correct
+        if ~p.Results.truncateToFrame, assert(all(szData(1:2)==[size(data,1),size(data,2)]),'Dimension for appending are inconsistant'); end
+        assert(strcmp(number_format, orig_number_format), 'The file number storage formats are incosistant');
+        %Update header
+        if p.Results.append, headerSize = double([dims, szData(1:2), szData(3) + size(data,3)]);
+        elseif p.Results.truncateToFrame, headerSize = double([dims, szData(1:2), p.Results.truncateToFrame]); %TODO this is not ideal in terms of the file is still gonna retain original size, we just never actually use the last parts
+        else headerSize = double([dims,szData(1:3)]);
+        end
         frewind(fid);
       else        
-        headerSize = double([3, padarray(size(p.Results.data),[0, 3-ndims(p.Results.data)],1,'post')]);
+        headerSize = double([3, padarray(size(data),[0, 3-ndims(data)],1,'post')]);
       end
       fwrite(fid,headerSize,'double');
       
-      %Write the header text (unless append)
-      if ~p.Results.append
+      %Write the header text (only on initial write %TODO, some asserts if it is correct)
+      if ~to_modify
         headerStr = blanks(100);
         lPrefix = length(p.Results.prefix);
         headerStr(1:min(10,length(number_format))) = number_format(1:min(10,length(number_format)));
@@ -60,23 +74,25 @@ function writeStack( path, data, varargin )
       end
       
       %Write the data
-      if ~p.Results.append
-        fwrite(fid,p.Results.data(:),number_format);
-        
-      elseif p.Results.append %Continue writing from eof
-        fseek(fid,0,'eof');
-        fwrite(fid,p.Results.data(:),number_format);
-      elseif p.Results.overwrite_frame
+      if ~to_modify
+        fwrite(fid,data(:),number_format);
+      else %When we do modification to existing stack
         frewind(fid);
         %Go to first frame start
-        dims = fread(fid, 1, number_format); %get ndims
-        szData = fread(fid,uint16(dims),number_format)'; %get frame sizes
+        dims = fread(fid, 1, 'double'); %get ndims
+        szData = fread(fid,dims,'double')'; %get frame sizes
         fseek(fid,100,'cof'); %skip the header
-        %Skip enough frames
         frameByteSkip = szData(1)*szData(2)*number_format_bytes;
-        fseek(fid,uint16((p.results.overwrite_frame-1)*frameByteSkip),'cof');
-        %Write the given data from current position
-        fwrite(fid,p.Results.data(:),number_format);
+        if p.Results.append %Continue writing from last frame
+          %Skip all true frames
+          fseek(fid,(szData(3)-size(data,3))*frameByteSkip,'cof');
+          fwrite(fid,data(:),number_format);
+        elseif p.Results.overwrite_frame
+          %Skip enough frames
+          fseek(fid,(p.Results.overwrite_frame-1)*frameByteSkip,'cof');
+          %Write the given data from current position
+          fwrite(fid,data(:),number_format);
+        end
       end
       
       %Close the file

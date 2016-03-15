@@ -8,7 +8,7 @@ if ~iscell(opts), opts = {opts}; end
 
 py = cell(numel(datas),1);
 
-parfor c1 = 1:numel(datas)
+for c1 = 1:numel(datas)
   data = datas{c1};
   H = Hs{c1};
   opt = opts{c1};
@@ -18,7 +18,7 @@ parfor c1 = 1:numel(datas)
   %Remove entries from H that are the wrong type
   h1 = 1;
   while h1<=numel(H)
-    [~,~,cur_type] = ind2sub([szY(1:2) opt.NSS],H(h1))
+    [~,~,cur_type] = ind2sub([szY(1:2) opt.NSS],H(h1));
     if cur_type ~= type, H(h1) = []; else h1 = h1+1; end
   end
   

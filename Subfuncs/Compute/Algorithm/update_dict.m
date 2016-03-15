@@ -10,7 +10,7 @@ if iscell(opts), opt=opts{1}; else opt = opts; end
 patches = pick_patches(datas,Hs,opts,type);
 
 if numel(patches) < k
-  warning(sprintf('Only %d of type %d objects have been found, returning the previous basis functions without learning\n', numel(patches), type));
+  warning(sprintf('\nOnly %d of type %d objects have been found, returning the previous basis functions without learning\n', numel(patches), type));
   W = W;
   return;
 end

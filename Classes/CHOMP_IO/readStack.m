@@ -40,7 +40,7 @@ function out = readStack(path, varargin)
   
   %preallocate the output array
   %szOutProd = [prod(szOut(1:2)),szOut(3:4)];
-  out = zeros(szOut); %simpler indexing
+  out = zeros(szOut,number_format); %simpler indexing
   
   %Determine the set of bytes we want to read, and where to put them within
   %the output array (assignment tensor)
@@ -83,12 +83,12 @@ function out = readStack(path, varargin)
     %Skip frames
     fseek(fid,frameSkips(t1)*frameSkipAmount,'cof');
     if isempty(p.Results.patch)
-      out(:,:,t1) = reshape(fread(fid,prod(szOut(1:2)),'double'),szOut(1:2));
+      out(:,:,t1) = reshape(fread(fid,prod(szOut(1:2)),number_format),szOut(1:2));
     elseif isstruct(p.Results.patch) %TODO still multiple possibilities, if frameBytes is dense, maybe worth loading the full frame
       fseek(fid,colSkipBef,'cof');
       for j1 = 1:szOut(2) %Read columns of the patch
         fseek(fid,rowSkipBef,'cof');
-        out(:,j1,t1,1) =  fread(fid,rowRead,'double');
+        out(:,j1,t1,1) =  fread(fid,rowRead,number_format);
         fseek(fid,rowSkipAft,'cof');
       end
       fseek(fid,colSkipAft,'cof'); %Arrive at start of next frame
@@ -104,7 +104,7 @@ function out = readStack(path, varargin)
           patchWritten = d2b(frameBytes(numCount), szOut(end)); %This determines which patches I am writing the number into
           withinPatchCount = withinPatchCount + patchWritten;
           cur_patches = all_patches(patchWritten);
-          cur_val = fread(fid,1,'double');
+          cur_val = fread(fid,1,number_format);
           for j1 = cur_patches
             out(withinPatchCount(j1),t1,j1) = cur_val;
           end
