@@ -1,9 +1,22 @@
-To use relative path names below an every-changing wokring directory, set "CHOMP_ROOT_FOLDER" enviromental variable to the directory you want to start from.
+To use relative path names below an every-changing working directory, set "CHOMP_ROOT_FOLDER" enviromental variable to the directory you want to start from.
 Very useful during SSHFS mounting of external drives. The classes will detect the enviroment on-load, so you always have the correct data path no matter if you work
 directly on the remote server, or on the local computer.
 
-TODO:
-- random proj: 
-	easy but inefficient version: just implement a random proj tensor, that maps from z*z patches to d*d size of basis functions and just multiply W with the tensor before convolution: doesn’t make sense cause we’re still doing the z*z size convolution:
-	better version is to do the random proj, compute the cumulant estimates already in random proj space, and just store those estimate at every location.
-	Because we dont have to store stuff in memory anymore, this would work well.
+Examine the chomp_options class to see all the parameters you might want to play with
+
+Most important parameters:
+ - Directory structure is defined by input_folder, output_folder, precomputed_folder and results_folder, the software will extensively use these (make sure there is proper read/write access at all times)
+ - data_path: path to one of your original tiff images / matlab stack / json directory
+ - src_string: inclusion criterion within file names (for most people something like *Ch2* or *.tif will work)
+ - file_prefix: You can define this custom file name portion for all files written by CHOMP. Note that all runs will be uniquely identified by time-stamping anyway.
+ 
+ - m: Basis function width, all cells should be smaller than this
+ - spatial_scale: resize your whole dataset spatially (such that cells are within m)
+ - time_scale: Downsample your data temporally (such that within-cell signal propagation is generally avoided)
+ 
+ - NSS: number of object types
+ - KS: dimensionality of subspace to describe an object type (# of basis functions / object type)
+
+ - niter: # of iterations (set it to 1 for inference)
+
+ - W_init: initial basis functions (can be empty in general, as they are learned iteratively)

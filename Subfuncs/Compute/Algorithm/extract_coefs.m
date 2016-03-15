@@ -16,7 +16,7 @@ Ntypes = opt.NSS;
 m = opt.m;
 sz = size(WY);
 
-H = zeros(opt.cells_per_image); %Location (linearized index)
+H = zeros(opt.cells_per_image,1); %Location (linearized index)
 X = zeros(opt.cells_per_image, size(W,2) * opt.mom); % Basis function coefficients
 L = zeros(opt.cells_per_image,1); % Likelihood gains
 
@@ -81,9 +81,9 @@ for j = 1:opt.cells_per_image
   
   if opt.fig >1
 %     set(0,'CurrentFigure',h_dl); imagesc(dL_mom(:,:,1)); colorbar; pause(0.05);
-    set(0,'CurrentFigure',h_dl); imagesc(dL.*Mask); colorbar; axis square;  pause(0.05);
-    set(0,'CurrentFigure',h_dl2); imagesc(dL_mom(:,:,min(1,size(dL_mom,3))).*Mask); colorbar; axis square; pause(0.05);
-    set(0,'CurrentFigure',h_dl3); imagesc(dL_mom(:,:,min(2,size(dL_mom,3))).*Mask); colorbar; axis square; pause(0.05);
+    set(0,'CurrentFigure',h_dl); imagesc(dL(:,:,1).*Mask); colorbar; axis square;  pause(0.05);
+    set(0,'CurrentFigure',h_dl2); imagesc(dL_mom(:,:,1,min(1,size(dL_mom,4))).*Mask); colorbar; axis square; pause(0.05);
+    set(0,'CurrentFigure',h_dl3); imagesc(dL_mom(:,:,1,min(2,size(dL_mom,4))).*Mask); colorbar; axis square; pause(0.05);
   
 %    set(0,'CurrentFigure',h_dl3); imagesc(Mask(:,:,1)); colorbar; axis square; pause(0.05);
   

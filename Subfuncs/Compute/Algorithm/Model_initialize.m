@@ -24,7 +24,7 @@ function [W,  Worig]  = Model_initialize( opt )
         [~, mask] = transform_inds_circ(0,0,150,opt.m,(opt.m-1)/2,(opt.m-5)/2); % . , . , ., filter size, circle outer radius, inner hole radius
         W(:,opt.Wblocks{type}(1)) = mask(:);
       case 'given'
-        W = opt.init_W{type};
+        W(:,opt.Wblocks{type}(1)) = opt.init_W(:,opt.Wblocks{type});
       otherwise
         error('CHOMP:learning:initialize', 'Model initialization option string (opt.init_model) does not correspond to implemented options.');
     end

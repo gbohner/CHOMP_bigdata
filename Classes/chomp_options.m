@@ -21,7 +21,7 @@ classdef chomp_options < handle
      NSS = 2; % Number of object types
      KS = 4; % Dimensionality of space per object type (i.e. number of basis functions per object type)
      init_model = {'filled', 'pointlike'}; % 'filled', 'donut', 'pointlike', \\ %TODO: 'supervised', 'multi'
-     init_W = {[],[]};
+     init_W = [];
 
      % Data extraction and preprocessing
      stabilize = 1;
@@ -106,7 +106,6 @@ classdef chomp_options < handle
     function obj = assert(obj)
       %Check for specific parameters to be in the correct format;
       if ~iscell(obj.init_model), obj.init_model = {obj.init_model}; end
-      if ~iscell(obj.init_W), obj.init_W = {obj.init_W}; end
       assert(numel(obj.init_model)==obj.NSS, 'CHOMP: Object type # discrepency');
     end
     

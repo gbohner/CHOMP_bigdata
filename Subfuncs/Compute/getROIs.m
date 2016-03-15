@@ -45,7 +45,7 @@ for i1 = 1:num_reconst
   reconst = reshape(W(:,opt.Wblocks{type})*(X(i1, opt.Wblocks{type})'), opt.m, opt.m);
   reconst = imrotate(reconst, 180);
   
-  figure; imagesc(reconst); pause
+  %figure; imagesc(reconst); pause
   
   switch opt.ROI_type
     case 'quantile'

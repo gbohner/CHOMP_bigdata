@@ -29,11 +29,7 @@ update_visualize( y,H,reshape(W,opt.m,opt.m,size(W,2)),opt,1,1);
 opt.ROI_type = 'quantile_dynamic_origsize';
 opt.ROI_params = 0.6;
 %opt.ROI_params = 0.7;
-if getRandom
-  [ROI_mask, ROIs] = getROIs(opt, min(30,numel(H)),1); opt.fig = 2;
-else
-  [ROI_mask, ROIs] = getROIs(opt, min(30,numel(H)),0); opt.fig = 2;
-end
+[ROI_mask, ROIs] = getROIs(opt, min(25,numel(H)),0); opt.fig = 2;
 figure(5);
 % subplottight(2, 1, 2);
 h_rois = imagesc(y_orig); colormap gray; axis image;
@@ -79,7 +75,7 @@ save(get_path(opt,'results'),'timeseries','ROIs','ROI_mask');
 %% Just plotting
 
 figure; 
-to_plot = [1:30];%[15:20];%[10:15]+30;
+to_plot = [1:20];%[15:20];%[10:15]+30;
 v = max(std(timeseries(to_plot,:),1))*2;
 for i1 = to_plot
   plot(timeseries(i1,:) + numel(to_plot)*v - i1*v, 'LineWidth', 2); hold on;

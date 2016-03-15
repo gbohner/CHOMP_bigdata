@@ -21,6 +21,7 @@ end
 [s,mess,messid] = mkdir([opt.root_folder opt.input_folder]);
 [s,mess,messid] = mkdir([opt.root_folder opt.output_folder]);
 [s,mess,messid] = mkdir([opt.root_folder opt.precomputed_folder]);
+[s,mess,messid] = mkdir([opt.root_folder opt.results_folder]);
 
 
 %Stabilize the image stack

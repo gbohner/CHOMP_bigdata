@@ -51,7 +51,7 @@ for type = 1:opt.NSS
         Wcur1 = Wcur1./norm(Wcur1(:)+1e-6); % make sure it has norm of 1.
         Wcur2 = Wcur2./norm(Wcur2(:)+1e-6); % make sure it has norm of 1.
 
-        WnormInv((type-1)*opt.KS+(type-1)*opt.KS+filt1,filt2,mom) = Wcur1(:)'*Wcur2(:); 
+        WnormInv((type-1)*opt.KS+filt1,(type-1)*opt.KS+filt2,mom) = Wcur1(:)'*Wcur2(:); 
       end
     end
   end

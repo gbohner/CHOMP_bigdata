@@ -7,7 +7,7 @@ function Model_learn( opt)
 load(get_path(opt), 'inp'); %could load opt as well, but it may have changed
 inp.opt = struct_merge(inp.opt, opt);
 
-if inp.opt.init_iter
+if inp.opt.init_iter %If not 0 we aren't starting from scratch
   load(get_path(inp.opt,'output_iter',inp.opt.init_iter) ,'model')
   if (inp.opt.init_iter+1)< inp.opt.niter && inp.opt.learn
       %Update the dictionary (the W filters)
@@ -18,7 +18,7 @@ if inp.opt.init_iter
   else
     W = model.W;
   end
-else
+else %Starting from scratch
   W  = Model_initialize(inp.opt);
 end
 

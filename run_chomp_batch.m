@@ -2,8 +2,7 @@ close all;
 clear all;
 
 cd(fileparts(mfilename('fullpath')));
-addpath('./Classes')
-addpath(genpath('./Subfuncs'));
+addpath(genpath('.'));
 
 setenv('CHOMP_ROOT_FOLDER',''); %
 
@@ -68,7 +67,7 @@ for iters = 1:5
   end
   for type = 1:opts{1}.NSS, Wblocked{type} = W_cur(:,opts{1}.Wblocks{type}); end
   for type = 1:opts{1}.NSS
-    Wblocked{type} = update_dict(datas,Hs,Wblocked{type},opts,iters+2,opts{1}.Wblocks{type});
+    Wblocked{type} = update_dict(datas,Hs,Wblocked{type},opts,iters+2,type);
   end
   for type = 1:opts{1}.NSS, W_cur(:,opts{1}.Wblocks{type}) = Wblocked{type}; end
 end
