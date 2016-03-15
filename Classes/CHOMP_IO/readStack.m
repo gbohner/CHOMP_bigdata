@@ -10,6 +10,12 @@ function out = readStack(path, varargin)
   szData = fread(fid,uint16(dims),'double')';
   headerStr = char(fread(fid,100,'char'))';
   
+  %Get the number format:
+  number_format = strtrim(headerStr(1:10));
+  tmp = 1; tmp = cast(tmp,number_format); tmp = whos('tmp');
+  number_format_bytes = tmp.bytes;
+  
+  
   p.addOptional('frames',1:szData(end),@isfloat);
   p.addParameter('patch',[],@(x)any([isempty(x),isstruct(x),iscell(x)]));
   p.addParameter('minDiskAccess',0,@isnumeric);
@@ -60,16 +66,15 @@ function out = readStack(path, varargin)
   %Do the reading procedure frame by frame, fill up the output array
   %accordingly
   
-  numSkipAmount = 8; % 8 bytes per double
-  frameSkipAmount = numSkipAmount * prod(szData(1:end-1)); %single frame
+  frameSkipAmount = number_format_bytes * prod(szData(1:end-1)); %single frame
   
   
   if isstruct(p.Results.patch)
-    rowSkipBef = (min(p.Results.patch.x)-1)*numSkipAmount;
+    rowSkipBef = (min(p.Results.patch.x)-1)*number_format_bytes;
     rowRead = numel(p.Results.patch.x);
-    rowSkipAft = szData(1)-max(p.Results.patch.x)*numSkipAmount;
-    colSkipBef = (min(p.Results.patch.y)-1)*szData(1)*numSkipAmount;
-    colSkipAft = (szData(2)-max(p.Results.patch.y))*szData(1)*numSkipAmount;
+    rowSkipAft = szData(1)-max(p.Results.patch.x)*number_format_bytes;
+    colSkipBef = (min(p.Results.patch.y)-1)*szData(1)*number_format_bytes;
+    colSkipAft = (szData(2)-max(p.Results.patch.y))*szData(1)*number_format_bytes;
   end
   
   all_patches = 1:szOut(end);
@@ -94,7 +99,7 @@ function out = readStack(path, varargin)
         numCount = 0;
         withinPatchCount = zeros(szOut(end),1); %TODO: if some rows or whatever is truncated, adjust accordingly maybe with a withinPatchCountSkips
         for i1 = 1:(numel(frameByteSkips)-1)
-          fseek(fid,frameByteSkips(i1)*numSkipAmount,'cof');
+          fseek(fid,frameByteSkips(i1)*number_format_bytes,'cof');
           numCount = numCount+frameByteSkips(i1)+1;
           patchWritten = d2b(frameBytes(numCount), szOut(end)); %This determines which patches I am writing the number into
           withinPatchCount = withinPatchCount + patchWritten;
@@ -104,7 +109,7 @@ function out = readStack(path, varargin)
             out(withinPatchCount(j1),t1,j1) = cur_val;
           end
         end
-        fseek(fid,frameByteSkips(end)*numSkipAmount,'cof');  
+        fseek(fid,frameByteSkips(end)*number_format_bytes,'cof');  
       end
     end
   end
@@ -112,6 +117,11 @@ function out = readStack(path, varargin)
   fclose(fid);
 
   out = reshape(out,szOut);
+  
+  %Make sure we return doubles
+  if ~strcmp(number_format,'double')
+    out = cast(out,'double');
+  end
 
 end
 

@@ -21,7 +21,7 @@ for filt = 1:size(W,2); %Different filters
   Wcurc = Wcurc./norm(Wcurc+1e-6); % make sure it has norm of 1.
   Wconv = reshape(Wcurc,opt.m,opt.m);
   
-  for t1 = 1:szY(end) %Can be done parallelly or on GPU 
+  for t1 = 1:szY(end) %TODO Can be done parallelly or on GPU 
     conv_result = conv2(data.proc_stack.Y(:,:,t1),Wconv,'same');
     for mom = 1:opt.mom  %Get raw moments of the projected time course at each possible cell location %TODO - this might be wrong, because it assumes equal weighting??? but it's filter by filter, so maybe the linear combination of filters is still linear in the higher moments %TOTHINK Nah it seems correct
       WY(:,:,filt,mom) = WY(:,:,filt,mom) + conv_result.^mom./szY(end);

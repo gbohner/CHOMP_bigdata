@@ -46,6 +46,10 @@ classdef chomp_data
       end
     end
     
+    function overwrite_frame(obj, data, frameNum)
+      writeStack(obj.Source,data,'overwrite_frame',frameNum);
+    end
+    
     function append(obj, data)
       writeStack(obj.Source,data,'append',1);
     end
