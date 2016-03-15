@@ -22,6 +22,8 @@ else
       end
     case 'results'
       output = [opt.results_folder opt.file_prefix '_' opt.timestamp '_results.mat'];
+    case 'results_image'
+      output = [opt.results_folder opt.file_prefix '_' opt.timestamp '_results_image.png'];
     otherwise
        error('CHOMP:util:nopath', 'The type of path you want get_path() to return is not implemented');
   end

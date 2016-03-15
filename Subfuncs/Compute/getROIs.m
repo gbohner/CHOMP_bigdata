@@ -90,16 +90,18 @@ for i1 = 1:num_reconst
       [inds, cut] = mat_boundary(szRaw(1:2),row-floor(cutsize/2):row+floor(cutsize/2),col-floor(cutsize/2):col+floor(cutsize/2));
       tmp = opt.ROI_params(1)*(max(reshape(y_orig(inds{1},inds{2}),1,[])')-min(reshape(y_orig(inds{1},inds{2}),1,[])'))+min(reshape(y_orig(inds{1},inds{2}),1,[])');
       tmp = sum(sum(y_orig(inds{1},inds{2})>tmp))./numel(y_orig(inds{1},inds{2})); %ratio of pixels to pick
-      [~, tmp_ind] = sort(reconst(:),'descend');
+      [reconst_vals, tmp_ind] = sort(reconst(:),'descend');
+      last_val = reconst_vals(floor(tmp*numel(reconst)));
+      last_ind = find(reconst_vals == last_val,1,'last');
       reconst(:) = 0;
-      reconst(tmp_ind(1:floor(tmp*numel(reconst))))=1;
+      reconst(tmp_ind(1:last_ind))=1;
       ROI_image(inds{1},inds{2}) = reconst(1+cut(1,1):end-cut(1,2),1+cut(2,1):end-cut(2,2));
     otherwise
       error('CHOMP:roi:method',  'Region of interest option string (opt.ROI_type) does not correspond to implemented options.')
   end
   
   %Store results in cells now, later add option for json output %TODO
-  ROIs{i1} = struct('col', col, 'row', row, 'mask', reconst);
+  ROIs{i1} = struct('col', col, 'row', row, 'type', type, 'mask', reconst);
   
   
   

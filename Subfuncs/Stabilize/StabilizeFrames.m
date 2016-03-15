@@ -17,6 +17,8 @@ if ~opt.stabilize,return; end
       y0 = double(zeros(size(y0)));
       %Read the initial images to create an average, always write out the
       %stabilized images
+      fprintf('Stabilizing the image stack...\n')
+      
       for i1 = 1:10
         y1 = imread([filepath allfiles(i1).name]);      
 
@@ -26,6 +28,8 @@ if ~opt.stabilize,return; end
 
       end
 
+      charcount = fprintf('Frame %.5s/%.5s is stabilized', num2str(i1), num2str(T));  
+      
       %Stabilize the images
       for i1 = 11:T
         y1 = imread([filepath allfiles(i1).name]);     
@@ -34,13 +38,21 @@ if ~opt.stabilize,return; end
         y0 = y0*(i1-1)/i1 + double(y1)./i1;
         
         imwrite(uint16(y1), get_path(opt, 'raw_stabilized_frames',i1));
-        imagesc(y0); colormap gray; axis image; pause(0.1);
+        if opt.fig > 1
+          imagesc(y0); colormap gray; axis image; pause(0.01);
+        end
+        
+        for c1 = 1:charcount, fprintf('\b'); end %deletes the line before
+        charcount = fprintf('Frame %.5s/%.5s is stabilized', num2str(i1), num2str(T));  
+        
       end
     end
     
     opt.data_path = get_path(opt, 'raw_stabilized_frames',1); %Set the data_path to the stabilized frames
     opt.data_path = opt.data_path(length(opt.root_folder)+1:end);
     opt.src_string = '*.tif';
+    
+    fprintf('\nImage stack stabilized, saved in folder %s\n', get_path(opt, 'raw_stabilized_frames'));
   end
 
 end

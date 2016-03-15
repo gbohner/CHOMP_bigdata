@@ -52,11 +52,9 @@ opt = chomp_options(...
 opt.input_folder = '~/stanford/input/';
 opt.output_folder = '~/stanford/output/';
 opt.precomputed_folder = '~/stanford/precomputed/';
-opt.results_folder = '~/stanford/results';
+opt.results_folder = '~/stanford/results/';
 
-opt.timestamp = '20160313T171700';
-
-opt.stabilize = 0;
+opt.stabilize = 2;
 
 % Varius param settings
 opt.spatial_scale = 1;
@@ -73,7 +71,7 @@ opt.cells_per_image = 25;
 
 [opt, ROI_mask, ROIs] = chomp(opt);
 
-get_cell_timeseries;
+get_cell_timeseries(opt);
 
 % load('../data_for_gergo/S1-T52844_masks.mat', 'donut')
 

@@ -1,6 +1,8 @@
 close all;
 clear all;
 
+%Runs perfectly on the neurofast server
+
 cd(fileparts(mfilename('fullpath')));
 addpath(genpath('.'));
 
@@ -22,8 +24,8 @@ opt_def_struct = struct(...
     'spatial_scale',1,...
     'time_scale',1,...
     'mask', 0, ...
-    'cells_per_image', 15, ...
-    'KS', 6 ...
+    'cells_per_image', 30, ...
+    'KS', 4 ...
   );
 
 
@@ -49,8 +51,12 @@ opts{2}.spatial_scale = 1.4;
 %Initialize basis subspaces
 W_cur = Model_initialize(opts{1});
 
-for iters = 1:5
+gtic = tic;
+
+maxiter = 5;
+for iters = 1:maxiter
   %Run chomp one inference step forward for each dataset
+  fprintf('Running batch inference on %d datasets, starting iteration %d/%d...\n',numel(opts),iters,maxiter);
   parfor n = 1:numel(opts)
     opts{n}.niter = iters;
     opts{n}.init_iter = iters-1;
@@ -58,6 +64,7 @@ for iters = 1:5
     opts{n} = chomp(opts{n});
   end
   
+  fprintf('Running batch learning on %d datasets, starting iteration %d/%d...\n',numel(opts),iters,maxiter);
   %Do the learning of new W jointly for all datasets
   for n=1:numel(opts)
     inp = load(get_path(opts{n}));
@@ -70,6 +77,14 @@ for iters = 1:5
     Wblocked{type} = update_dict(datas,Hs,Wblocked{type},opts,iters+2,type);
   end
   for type = 1:opts{1}.NSS, W_cur(:,opts{1}.Wblocks{type}) = Wblocked{type}; end
+  
+  fprintf('Finished batch iteration %d/%d, time elapsed is %.2f\n',iters,maxiter,toc(gtic));
+end
+
+%Get time series for all datasets
+timeseries = cell(numel(opts),1);
+for n = 1:numel(opts)
+  timeseries{n} = get_cell_timeseries(opts{n});
 end
 
 
