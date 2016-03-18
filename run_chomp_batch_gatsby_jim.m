@@ -6,58 +6,77 @@ clear all;
 cd(fileparts(mfilename('fullpath')));
 addpath(genpath('.'));
 
-setenv('CHOMP_ROOT_FOLDER',''); %
+setenv('CHOMP_ROOT_FOLDER','/nfs/nhome/data3/Jim2016/'); %
 
 opt_def_struct = struct(...
     'root_folder', getenv('CHOMP_ROOT_FOLDER'), ...
-    'input_folder', '/neurotank/derived/gbohner/input/', ...
-    'output_folder', '/neurotank/derived/gbohner/output/', ...
-    'precomputed_folder', '/neurotank/derived/gbohner/precomputed/', ...
-    'results_folder', '/neurotank/derived/gbohner/results', ...
+    'input_folder', 'input/', ...
+    'output_folder', 'output/', ...
+    'precomputed_folder', 'precomputed/', ...
+    'results_folder', 'results/', ...
+    'src_string', '*Ch2*', ...
     'data_type', 'frames_virtual', ...
     'init_model',{{'filled','pointlike'}}, ...
     'stabilize', 1, ...
-    'niter', 4, ...
-    'm', 17, ...
+    'niter', 1, ...
+    'm', 25, ...
     'mom', 2, ...
     'fig',1, ...
     'spatial_scale',1,...
     'time_scale',1,...
     'mask', 0, ...
-    'cells_per_image', 30, ...
-    'KS', 4 ...
+    'cells_per_image', 50, ...
+    'KS', 6 ...
   );
 
 
 %Initialize all datasets to the same options (shouldn't use the same
 %chomp_options object and deal(obj) because it is passed by reference then)
-opts = cell(2,1);
+opts = cell(5,1);
 for n = 1:numel(opts)
     opts{n} = chomp_options(opt_def_struct);
 end
 
-
-for n = each folder in mouse
-  opts{n}.data_
-
+cellsize  = {};
  
 %Set the individually differing parameters (possibly automatically later)
-opts{1}.data_path = '/neurotank/Watkins/2016-02-12/2P/CenterOutReach/site005/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-021/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-021_Cycle00001_Ch2_000001.ome.tif';
+opts{1}.data_path = '/nfs/nhome/data3/Jim2016/vStim043/vStim-043_Cycle00001_CurrentSettings_Ch2_000001.tif';
 [~, opts{1}.file_prefix] = fileparts(opts{1}.data_path);
 %Make sure apparent neuron sizes are the same, as well as they are within
 %the used basis function size
-opts{1}.spatial_scale = 0.7;
+%cell size 25
 
-opts{2}.data_path = '/neurotank/Watkins/2016-02-12/2P/CenterOutReach/site005/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-024/Tseries_20160212_Watkins_CenterOutReach_time20160212.123454.112-024_Cycle00001_Ch2_000001.ome.tif';
+opts{2}.data_path = '/nfs/nhome/data3/Jim2016/vStim044/vStim-044_Cycle00001_CurrentSettings_Ch2_000001.tif';
 [~, opts{2}.file_prefix] = fileparts(opts{2}.data_path);
-opts{2}.spatial_scale = 1.4;
+%Make sure apparent neuron sizes are the same, as well as they are within
+%the used basis function size
+%cell size 25
+
+
+opts{3}.data_path = '/nfs/nhome/data3/Jim2016/visualStim-002/visualStim-002_Cycle00001_CurrentSettings_Ch1_000001.tif';
+[~, opts{3}.file_prefix] = fileparts(opts{3}.data_path);
+%Make sure apparent neuron sizes are the same, as well as they are within
+%the used basis function siz
+%cell size 25
+
+opts{4}.data_path = '/nfs/nhome/data3/Jim2016/visualStim-004/visualStim-004_Cycle00001_CurrentSettings_Ch1_000001.tif';
+[~, opts{4}.file_prefix] = fileparts(opts{4}.data_path);
+%Make sure apparent neuron sizes are the same, as well as they are within
+%the used basis function siz
+%cell size 25
+
+opts{5}.data_path = '/nfs/nhome/data3/Jim2016/visualStim-005/visualStim-005_Cycle00001_CurrentSettings_Ch1_000001.tif';
+[~, opts{5}.file_prefix] = fileparts(opts{5}.data_path);
+%Make sure apparent neuron sizes are the same, as well as they are within
+%the used basis function siz
+%cell size 25
 
 %Initialize basis subspaces
 W_cur = Model_initialize(opts{1});
 
 gtic = tic;
 
-maxiter = 5;
+maxiter = 10;
 for iters = 1:maxiter
   %Run chomp one inference step forward for each dataset
   fprintf('Running batch inference on %d datasets, starting iteration %d/%d...\n',numel(opts),iters,maxiter);
