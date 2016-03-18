@@ -51,7 +51,8 @@ else %Handle the data loading-preprocessing-saving
     T = size(allfiles,1);
     sz = size(imresize(imread([filepath allfiles(1).name]),opt.spatial_scale));
     %Store the file links to the raw data
-    data.raw = datastore(strcat(filepath, {allfiles.name}),'FileExtension','.tif','Type', 'image');
+    %data.raw = datastore(strcat(filepath, {allfiles.name}),'FileExtension','.tif','Type', 'image');
+    data.raw = strcat(filepath, {allfiles.name});
     raw_stack_done = 0; if exist(get_path(opt,'raw_virtual_stack'),'file'), raw_stack_done = 1; end;
     if raw_stack_done, data.raw_stack.Y = chomp_data(get_path(opt,'raw_virtual_stack')); 
     else
@@ -73,7 +74,10 @@ else %Handle the data loading-preprocessing-saving
       T = size(allfiles,1);
       sz = size(imresize(imread([filepath allfiles(1).name]),opt.spatial_scale));
       %Store the file links to the raw data
-      data.raw = datastore(strcat(filepath, {allfiles.name}),'FileExtension','.tif','Type', 'image');
+      %data.raw = datastore(strcat(filepath, {allfiles.name}),'FileExtension','.tif','Type', 'image');
+      %Old matlab versions don't support datastore, let's just not use it
+      %for now
+      data.raw = strcat(filepath, {allfiles.name});
       raw_stack_done = 0; if exist(get_path(opt,'raw_virtual_stack'),'file'), raw_stack_done = 1; end;
       if raw_stack_done, data.raw_stack.Y = chomp_data(get_path(opt,'raw_virtual_stack')); 
       else
