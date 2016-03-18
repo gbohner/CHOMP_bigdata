@@ -6,7 +6,7 @@ clear all;
 cd(fileparts(mfilename('fullpath')));
 addpath(genpath('.'));
 
-setenv('CHOMP_ROOT_FOLDER','/nfs/data3/gergo/Jim2016/'); %
+setenv('CHOMP_ROOT_FOLDER','/mnt/gatsby/nfs/data3/gergo/Jim2016/'); %
 
 opt_def_struct = struct(...
     'root_folder', getenv('CHOMP_ROOT_FOLDER'), ...
@@ -40,32 +40,32 @@ end
 cellsize  = {};
  
 %Set the individually differing parameters (possibly automatically later)
-opts{1}.data_path = [getenv('CHOMP_ROOT_FOLDER') 'vStim043/vStim-043_Cycle00001_CurrentSettings_Ch2_000001.tif'];
+opts{1}.data_path = 'vStim-043/vStim-043_Cycle00001_CurrentSettings_Ch2_000001.tif';
 [~, opts{1}.file_prefix] = fileparts(opts{1}.data_path);
 %Make sure apparent neuron sizes are the same, as well as they are within
 %the used basis function size
 %cell size 25
 
-opts{2}.data_path = [getenv('CHOMP_ROOT_FOLDER') 'vStim-044/vStim-044_Cycle00001_CurrentSettings_Ch2_000001.tif'];
+opts{2}.data_path = 'vStim-044/vStim-044_Cycle00001_CurrentSettings_Ch2_000001.tif';
 [~, opts{2}.file_prefix] = fileparts(opts{2}.data_path);
 %Make sure apparent neuron sizes are the same, as well as they are within
 %the used basis function size
 %cell size 25
 
 
-opts{3}.data_path = [getenv('CHOMP_ROOT_FOLDER') '/visualStim-002/visualStim-002_Cycle00001_CurrentSettings_Ch1_000001.tif'];
+opts{3}.data_path = '/visualStim-002/visualStim-002_Cycle00001_CurrentSettings_Ch1_000001.tif';
 [~, opts{3}.file_prefix] = fileparts(opts{3}.data_path);
 %Make sure apparent neuron sizes are the same, as well as they are within
 %the used basis function siz
 %cell size 25
 
-opts{4}.data_path = [getenv('CHOMP_ROOT_FOLDER') 'visualStim-004/visualStim-004_Cycle00001_CurrentSettings_Ch1_000001.tif'];
+opts{4}.data_path = 'visualStim-004/visualStim-004_Cycle00001_CurrentSettings_Ch1_000001.tif';
 [~, opts{4}.file_prefix] = fileparts(opts{4}.data_path);
 %Make sure apparent neuron sizes are the same, as well as they are within
 %the used basis function siz
 %cell size 25
 
-opts{5}.data_path = [getenv('CHOMP_ROOT_FOLDER') '/visualStim-005/visualStim-005_Cycle00001_CurrentSettings_Ch1_000001.tif'];
+opts{5}.data_path = '/visualStim-005/visualStim-005_Cycle00001_CurrentSettings_Ch1_000001.tif';
 [~, opts{5}.file_prefix] = fileparts(opts{5}.data_path);
 %Make sure apparent neuron sizes are the same, as well as they are within
 %the used basis function siz
