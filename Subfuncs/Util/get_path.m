@@ -2,7 +2,13 @@ function output = get_path( opt,varargin)
 %GET_PATH Gets the path for certain important files, by default the intermediate input data file, with different secondary options you can modify that
 
 if nargin==1
-  output = [opt.input_folder opt.file_prefix '_' opt.timestamp '.mat'];
+  if ~isempty(opt.timestamp)
+    output = [opt.input_folder opt.file_prefix '_' opt.timestamp '.mat'];
+  else %Get file with newest timestamp
+    output = dir([opt.root_folder opt.input_folder opt.file_prefix '_*T*.mat']);
+    [~, tmp] = sort([output.datenum]);
+    output = [opt.input_folder output(tmp(end)).name];
+  end
 else
   switch varargin{1}
     case 'output_iter'

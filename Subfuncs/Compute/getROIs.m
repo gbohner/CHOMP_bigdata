@@ -42,10 +42,17 @@ end
 
 for i1 = 1:num_reconst
   [row,col,type] = ind2sub(sz,H(i1));
-  reconst = reshape(W(:,opt.Wblocks{type})*(X(i1, opt.Wblocks{type})'), opt.m, opt.m);
-  reconst = imrotate(reconst, 180);
+  if opt.mom>=2 %Then reconstruct variance image
+    reconst = reshape(W(:,opt.Wblocks{type})*(X(i1, opt.NSS*opt.KS+opt.Wblocks{type})'), opt.m, opt.m);
+  else
+    reconst =  reshape(W(:,opt.Wblocks{type})*(X(i1, opt.Wblocks{type})'), opt.m, opt.m);
+  end
+  %reconst = imrotate(reconst, 180); %TODO think about if we need to
+  %rotate, make sure its in accordance with the convolution procedure
   
-  %figure; imagesc(reconst); pause
+  if opt.fig>=3
+    figure; imagesc(reconst); pause(0.2);
+  end
   
   switch opt.ROI_type
     case 'quantile'

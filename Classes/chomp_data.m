@@ -25,7 +25,11 @@ classdef chomp_data
     
     function out = subsref(obj, subs)
       if strcmp(subs(1).type,'.')
-        out = obj.(subs(1).subs);
+        if numel(subs)==1
+          out = obj.(subs(1).subs);
+        else
+          out = builtin('subsref',obj.(subs(1).subs),subs(2:end));
+        end
       elseif strcmp(subs(1).type, '()')
         assert(numel(subs(1).subs)==numel(size(obj)),'Wrong chomp_data subsref #dims');
         szData = size(obj);
@@ -57,7 +61,11 @@ classdef chomp_data
     
     function obj = subsasgn(obj,subs,val)
       if strcmp(subs(1).type,'.')
-        obj.(subs(1).subs) = val;
+        if numel(subs)==1
+          obj.(subs(1).subs)=val;
+        else
+          obj.(subs(1).subs) = builtin('subsasgn',obj.(subs(1).subs),subs(2:end),val);
+        end
       elseif strcmp(subs(1).type,'()')
         %Only handle overwriting a set of frames, appending or truncating
         assert(strcmp(subs(1).subs{1},':') && strcmp(subs(1).subs{2},':'), 'Only full frames can be overwritten, patches cannot')

@@ -3,10 +3,10 @@ clear all;
 
 %Runs perfectly on the neurofast server
 
-cd(fileparts(mfilename('fullpath')));
+%cd(fileparts(mfilename('fullpath')));
 addpath(genpath('.'));
 
-setenv('CHOMP_ROOT_FOLDER','/mnt/gatsby/nfs/data3/gergo/Jim2016/'); %
+setenv('CHOMP_ROOT_FOLDER','/nfs/data3/gergo/Jim2016/'); %
 
 opt_def_struct = struct(...
     'root_folder', getenv('CHOMP_ROOT_FOLDER'), ...
@@ -71,6 +71,8 @@ opts{5}.data_path = '/visualStim-005/visualStim-005_Cycle00001_CurrentSettings_C
 %the used basis function siz
 %cell size 25
 
+%%
+
 %Initialize basis subspaces
 W_cur = Model_initialize(opts{1});
 
@@ -103,6 +105,8 @@ for iters = 1:maxiter
   
   fprintf('Finished batch iteration %d/%d, time elapsed is %.2f\n',iters,maxiter,toc(gtic));
 end
+
+%%
 
 %Get time series for all datasets
 timeseries = cell(numel(opts),1);

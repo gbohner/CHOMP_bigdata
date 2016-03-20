@@ -19,10 +19,10 @@ opt=inp.opt;
 
 %% Getting ROIs
 if opt.fig
-  update_visualize( y,H,reshape(W,opt.m,opt.m,size(W,2)),opt,1,1);
+  update_visualize( y_orig,H,reshape(W,opt.m,opt.m,size(W,2)),opt,1,1);
 end
 opt.ROI_type = 'quantile_dynamic_origsize';
-opt.ROI_params = 0.5;
+opt.ROI_params = 0.6;
 [ROI_mask, ROIs] = getROIs(opt, numel(H),0); opt.fig = 2;
 h_roi_figure= figure;
 if ~opt.fig, set(h_roi_figure,'Visible','off'); end 
