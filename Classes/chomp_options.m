@@ -48,12 +48,12 @@ classdef chomp_options < handle
      warmup = 1;
      learn   = 1; % do learning?
      spatial_push % = @(grid_dist)logsig(0.5*grid_dist-floor(options.m/2-1)); % Specified distance based function (leave as [] if not desired)
-     learn_decomp = 'COV'; % COV, LMSVD, HOSVD or MTF (MTF not implemented yet, %TODO - write R wrapper to use Kahn2015 code)
+     learn_decomp = 'COV_RAW'; % COV_RAW, COV, LMSVD, HOSVD or MTF (MTF not implemented yet, %TODO - write R wrapper to use Kahn2015 code)
 
 
     % Extracting ROIs
      ROI_type = 'quantile_dynamic_origsize';
-     ROI_params = [0.6];
+     ROI_params = [0.4];
 
 
      % Misc parameters

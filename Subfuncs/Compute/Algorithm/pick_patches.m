@@ -6,11 +6,12 @@ if ~iscell(datas), datas = {datas}; end
 if ~iscell(Hs), Hs = {Hs}; end
 if ~iscell(opts), opts = {opts}; end
 
-do_cov = 1;
+do_cov = 2; 
+% 0 - return all n order patches, 
+% 1 - return covariance matrix build from n-order patches, 
+% 2- return covariance matrix built from raw patches
 if nargin > 4 %Check if we want to just output the covariance matrix instantly
-  if varargin{1} == 0
-    do_cov = 0;
-  end
+  do_cov = varargin{1};
 end
 
 py = cell(numel(datas),1);
@@ -39,12 +40,29 @@ for c1 = 1:numel(datas)
   
   if ~isempty(H)
     patches = get_patch(data.proc_stack, opt, H);
+  else
+    out = [];
+    num_cells = 0;
+    col_count = 0;
+    return;
   end
-
+  
   num_cells(c1,1) = numel(H);
+  
+  if do_cov == 2
+    %Just build the covariance matrix out of the raw patch samples
+    patches = reshape(patches,opt.m^2,[]);
+    patches = bsxfun(@minus, patches, mean(patches,2));
+    col_count = size(patches,2);
+    out = patches * patches';
+    return;
+  end
+    
+
   
   %Pick the patches
   for h1 = 1:numel(H)
+    disp(h1);
     curpy = get_n_order_patch(patches(:,:,:,h1), opt, szY);
     %Also weigth every moment tensor according to the number of independent
     %elements (patchsize multichoose mom) over total number of elements
@@ -54,8 +72,8 @@ for c1 = 1:numel(datas)
     if do_cov
       %Just store the resulting covariance matrix
       for mom1 = 1:opt.mom
-        py{c1}.mat = py{c1}.mat + curpy{mom1}*curpy{mom1}'./10000; %division for numerical stability
-        py{c1}.count = py{c1}.count + size(curpy{mom1},2); %number of columns
+        py{c1}.mat = py{c1}.mat + reshape(curpy{mom1},size(curpy{mom1},1),[])*reshape(curpy{mom1},size(curpy{mom1},1),[])'./10000; %reshape to flat for "HOSVD" and division for numerical stability
+        py{c1}.count = py{c1}.count + size(reshape(curpy{mom1},size(curpy{mom1},1),[]),2); %number of columns
       end
     else
       %Store all the individual, weighted and flattened vectors

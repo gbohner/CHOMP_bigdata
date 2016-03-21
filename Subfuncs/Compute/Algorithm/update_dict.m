@@ -6,8 +6,10 @@ function [W] = update_dict(datas,Hs,W,opts,k,type)
 
 if iscell(opts), opt=opts{1}; else opt = opts; end
   
-if strcmp(opt.learn_decomp,'COV')
-  [patch_cov, num_cells, col_count] = pick_patches(datas,Hs,opts,type);
+if strcmp(opt.learn_decomp,'COV_RAW')
+  [patch_cov, num_cells, col_count] = pick_patches(datas,Hs,opts,type, 2);
+elseif strcmp(opt.learn_decomp,'COV')
+  [patch_cov, num_cells, col_count] = pick_patches(datas,Hs,opts,type, 1);
 else
   [patches, num_cells, col_count] = pick_patches(datas,Hs,opts,type,0);
 end
@@ -19,6 +21,9 @@ if num_cells < k
 end
 
 switch opt.learn_decomp
+  case 'COV_RAW'
+    [U,Sv,explained] = pcacov(patch_cov);
+    Sv = sqrt(Sv*(col_count-num_cells));
   case 'COV'
     [U,Sv,explained] = pcacov(patch_cov);
     Sv = sqrt(Sv*(col_count-num_cells));
