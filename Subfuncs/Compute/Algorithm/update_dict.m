@@ -6,19 +6,22 @@ function [W] = update_dict(datas,Hs,W,opts,k,type)
 
 if iscell(opts), opt=opts{1}; else opt = opts; end
   
+if strcmp(opt.learn_decomp,'COV')
+  [patch_cov, num_cells, col_count] = pick_patches(datas,Hs,opts,type);
+else
+  [patches, num_cells, col_count] = pick_patches(datas,Hs,opts,type,0);
+end
 
-patches = pick_patches(datas,Hs,opts,type);
-
-if numel(patches) < k
-  warning(sprintf('\nOnly %d of type %d objects have been found, returning the previous basis functions without learning\n', numel(patches), type));
+if num_cells < k
+  warning(sprintf('\nOnly %d of type %d objects have been found, returning the previous basis functions without learning\n', num_cells, type));
   W = W;
   return;
 end
 
-patches = flatten_patches(patches);
-
-
 switch opt.learn_decomp
+  case 'COV'
+    [U,Sv,explained] = pcacov(patch_cov);
+    Sv = sqrt(Sv*(col_count-num_cells));
   case 'LMSVD'    
     [U, Sv] = lmsvd(patches,k);
   case 'MTF'
@@ -71,21 +74,6 @@ mask = logical(mask);
 for k = 1:size(W,2)
   if sum(W(mask(:),k)) < sum(W(~mask(:),k))
     W(:,k) = -1.*W(:,k);
-  end
-end
-
-function py=flatten_patches(patches)
-  py = [];
-  for i1 = 1:length(patches)
-      out = [];
-      patch = patches{i1};
-      for mom = 1:opt.mom
-        cur = patch{mom};
-        cur = reshape(cur,opt.m^2,[]);
-        cur = cur./size(cur,2); %normalize by dimensionality
-        out = [out, cur];
-      end
-      py(:,end+1:end+size(out,2)) = out;
   end
 end
 

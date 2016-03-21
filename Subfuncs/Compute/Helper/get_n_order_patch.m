@@ -9,5 +9,8 @@ function patch_out = get_n_order_patch(patch_block, opt, szY)
       patch_out{mom} = patch_out{mom} + patch{t1,mom}./szY(end); %Add the patch's momth moment tensor divided by total time points
     end
   end
+  
+  %Convert the raw moment tensors into cumulant tensors
+  patch_out = raw2cum_multivariate( patch_out );
 end
 

@@ -1,4 +1,4 @@
-function [out] = pick_patches( datas, Hs, opts,type)
+function [out, num_cells, col_count] = pick_patches( datas, Hs, opts,type, varargin)
 %PICK_PATCHES Returns patches to learn from, Y is the data tensor, H are the spatial locations, type is cell type number
 
 %Make sure all the input are cell arrays (of possibly multiple datasets)
@@ -6,7 +6,15 @@ if ~iscell(datas), datas = {datas}; end
 if ~iscell(Hs), Hs = {Hs}; end
 if ~iscell(opts), opts = {opts}; end
 
+do_cov = 1;
+if nargin > 4 %Check if we want to just output the covariance matrix instantly
+  if varargin{1} == 0
+    do_cov = 0;
+  end
+end
+
 py = cell(numel(datas),1);
+num_cells = zeros(numel(datas,1));
 
 for c1 = 1:numel(datas)
   data = datas{c1};
@@ -23,25 +31,77 @@ for c1 = 1:numel(datas)
   end
   
   
-  py{c1} = cell(numel(H),1);
-  
+  if do_cov
+    py{c1} = struct('mat',zeros(opt.m^2), 'count', 0);
+  else
+    py{c1} = cell(numel(H),1);
+  end
   
   if ~isempty(H)
     patches = get_patch(data.proc_stack, opt, H);
   end
 
+  num_cells(c1,1) = numel(H);
+  
   %Pick the patches
   for h1 = 1:numel(H)
     curpy = get_n_order_patch(patches(:,:,:,h1), opt, szY);
-    py{c1}{h1} = curpy;
+    %Also weigth every moment tensor according to the number of independent
+    %elements (patchsize multichoose mom) over total number of elements
+    for mom1 = 1:opt.mom
+      curpy{mom1} = curpy{mom1} .* (nchoosek(opt.m^2+mom1-1,mom1)./((opt.m^2).^mom1));
+    end
+    if do_cov
+      %Just store the resulting covariance matrix
+      for mom1 = 1:opt.mom
+        py{c1}.mat = py{c1}.mat + curpy{mom1}*curpy{mom1}'./10000; %division for numerical stability
+        py{c1}.count = py{c1}.count + size(curpy{mom1},2); %number of columns
+      end
+    else
+      %Store all the individual, weighted and flattened vectors
+      py{c1}{h1} = curpy;
+    end
   end
 
 
 end
 
-%Concatanate the results into a 1D array of cell arrays
-out={};
-for c1 = 1:numel(py)
-out(end+1:end+numel(py{c1})) = py{c1};
+if do_cov
+  out = zeros(opt.m^2, opt.m^2);
+  col_count = 0;
+  for c1 = 1:numel(py);
+    %Combine all the info from all datasets, with numerical stability
+    weigth = (10000*py{c1}.count - 1);
+    out = out + py{c1}.mat./weigth; %number of samples
+    col_count = col_count + py{c1}.count;
+  end
+else
+  %Concatanate the results into a 1D array of cell arrays
+  out={};
+  for c1 = 1:numel(py)
+    out(end+1:end+numel(py{c1})) = py{c1};
+  end
+
+  out = flatten_patches(patches, opt); % opt.m^2 x (location*(opt.m^2)^opt.mom)  - very flat matrix
+  col_count = size(out,2);
+end
+
+num_cells = sum(num_cells);
+
+
+function py=flatten_patches(patches,opt)
+  py = [];
+  for i1 = 1:length(patches)
+      out1 = [];
+      patch = patches{i1};
+      for mom = 1:opt.mom
+        cur = patch{mom};
+        cur = reshape(cur,opt.m^2,[]);
+        cur = cur./size(cur,2); %normalize by dimensionality
+        out1 = [out1, cur];
+      end
+      py(:,end+1:end+size(out1,2)) = out1;
+  end
+end
 
 end
