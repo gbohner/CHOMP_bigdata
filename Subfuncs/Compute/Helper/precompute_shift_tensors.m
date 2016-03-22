@@ -5,7 +5,9 @@ savefile = get_path(opt, 'precomputed');
 % Compute shift tensors for all moments and shifts
 GPT = cell(2*opt.m-1, 2*opt.m-1, opt.mom);
 
-fprintf('\nComputing the interaction tensor...\n');
+if opt.verbose
+  fprintf('\nComputing the interaction tensor...\n');
+end
 
 for mom1 = 1:opt.mom
   inpuf = [ones(1,2*mom1)*opt.m]; %unfolded dimensions in non-feature-space
@@ -14,8 +16,10 @@ for mom1 = 1:opt.mom
   charcount = 0;
   %Iterate through shifts
   for s1 = 1:(2*opt.m-1)
-    if charcount>0, for c1 = 1:charcount, fprintf('\b'); end; end
-    charcount = fprintf('Progress is currently %d/%d moment, %d/%d shift\n',mom1, opt.mom, s1, 2*opt.m-1);
+    if opt.verbose > 1
+      if charcount>0, for c1 = 1:charcount, fprintf('\b'); end; end
+      charcount = fprintf('Progress is currently %d/%d moment, %d/%d shift\n',mom1, opt.mom, s1, 2*opt.m-1);
+    end
  
     curm = opt.m; %just to use in the parfor not having to pass through the whole opt struct
     for s2 = 1:(2*opt.m-1)

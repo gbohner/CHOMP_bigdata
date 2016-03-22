@@ -12,9 +12,13 @@ if inp.opt.init_iter %If not 0 we aren't starting from scratch
   if (inp.opt.init_iter+1)< inp.opt.niter && inp.opt.learn
       %Update the dictionary (the W filters)
       utic = tic;
-      fprintf('Iteration %d/%d, updating dictionary...', inp.opt.init_iter, inp.opt.niter);
+      if inp.opt.verbose
+        fprintf('Iteration %d/%d, updating dictionary...', inp.opt.init_iter, inp.opt.niter);
+      end
       [W] = update_dict(inp.data,model.H,model.W,inp.opt,inp.opt.init_iter+2);
-      fprintf(' took %.2f seconds\n',toc(utic))
+      if inp.opt.verbose
+        fprintf(' took %.2f seconds\n',toc(utic))
+      end
   elseif ~isempty(inp.opt.init_W)
     W = inp.opt.init_W;
   else
@@ -31,8 +35,10 @@ ltic = tic;
 for n = (inp.opt.init_iter+1):inp.opt.niter 
     
     itic = tic;
-  
-    fprintf('Iteration %d/%d, inferring cell locations...', n, inp.opt.niter);
+    
+    if inp.opt.verbose
+      fprintf('Iteration %d/%d, inferring cell locations...', n, inp.opt.niter);
+    end
     %Compute convolution of Y with the filters as well as the "local Gram
     %matrices of filters to use in the matching pursuit step afterwards
     [WY, GW, WnormInv] = compute_filters(inp.data, W, inp.opt );
@@ -48,7 +54,9 @@ for n = (inp.opt.init_iter+1):inp.opt.niter
     model = chomp_model(inp.opt,W,H,X,L,inp.y,inp.y_orig,inp.V);
     save(get_path(inp.opt,'output_iter',n) ,'model')
     
-    fprintf(' took %.2f seconds\n',toc(itic))
+    if inp.opt.verbose
+      fprintf(' took %.2f seconds\n',toc(itic));
+    end
     
     %Visualize model
     if inp.opt.fig >0
@@ -60,14 +68,20 @@ for n = (inp.opt.init_iter+1):inp.opt.niter
     if n < inp.opt.niter && inp.opt.learn
       utic = tic;
       %Update the dictionary (the W filters)
-      fprintf('Iteration %d/%d, updating dictionary...', n, inp.opt.niter);
+      if inp.opt.verbose
+        fprintf('Iteration %d/%d, updating dictionary...', n, inp.opt.niter);
+      end
       for type = 1:inp.opt.NSS
         W(:,inp.opt.Wblocks{type}) = update_dict(inp.data,model.H,model.W(:,inp.opt.Wblocks{type}),inp.opt,n+2,type);
       end
-      fprintf(' took %.2f seconds\n',toc(utic))
+      if inp.opt.verbose
+        fprintf(' took %.2f seconds\n',toc(utic))
+      end
     end
      
-    fprintf('Iteration %d/%d finished, elapsed time is %0.2f seconds\n', n, inp.opt.niter, toc(ltic))
+    if inp.opt.verbose
+      fprintf('Iteration %d/%d finished, elapsed time is %0.2f seconds\n', n, inp.opt.niter, toc(ltic))
+    end
 
 end
 

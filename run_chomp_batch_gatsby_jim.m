@@ -6,7 +6,7 @@ clear all;
 %cd(fileparts(mfilename('fullpath')));
 addpath(genpath('.'));
 
-setenv('CHOMP_ROOT_FOLDER','/nfs/data3/gergo/Jim2016/'); %
+%setenv('CHOMP_ROOT_FOLDER','/nfs/data3/gergo/Jim2016/'); %
 
 opt_def_struct = struct(...
     'root_folder', getenv('CHOMP_ROOT_FOLDER'), ...
@@ -86,8 +86,14 @@ for iters = 1:maxiter
     opts{n}.niter = iters;
     opts{n}.init_iter = iters-1;
     opts{n}.init_W = W_cur;
+    %For last iteration do inference on many proposed objects
+    opts{n}.cells_per_image = opts{n}.cells_per_image * 10;
+    opts{n}.learn = 0;
     opts{n} = chomp(opts{n});
   end
+  
+  %For last iteration no learning
+  if iters == maxiter, break; end;
   
   fprintf('Running batch learning on %d datasets, starting iteration %d/%d...\n',numel(opts),iters,maxiter);
   %Do the learning of new W jointly for all datasets
@@ -104,7 +110,7 @@ for iters = 1:maxiter
   for type = 1:opts{1}.NSS, W_cur(:,opts{1}.Wblocks{type}) = Wblocked{type}; end
   
   fprintf('Finished batch iteration %d/%d, time elapsed is %.2f\n',iters,maxiter,toc(gtic));
-end
+end 
 
 %%
 

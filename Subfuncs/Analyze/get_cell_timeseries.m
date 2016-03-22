@@ -12,7 +12,7 @@ function timeseries = get_cell_timeseries(opt)
 load(get_path(opt),'inp');
 data = inp.data;
 load(get_path(inp.opt,'output_iter',inp.opt.niter),'model');
-[H, W, X, y_orig, y] = model.get_fields( 'H', 'W', 'X', 'y_orig','y');
+[H, W, X, y_orig, y, L] = model.get_fields( 'H', 'W', 'X', 'y_orig','y','L');
 opt=inp.opt;
 
 
@@ -70,7 +70,7 @@ for i1 = 1:numel(H)
   timeseries(i1,:) = mply(ROIs{i1}.mask, patches(:,:,:,i1),2)./sum(ROIs{i1}.mask(:));
 end
 
-save(get_path(opt,'results'),'timeseries','ROIs','ROI_mask','opt');
+save(get_path(opt,'results'),'timeseries','ROIs','ROI_mask','patches','model','opt');
 
 %% Just plotting
 

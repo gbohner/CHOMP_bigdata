@@ -20,3 +20,12 @@ Most important parameters:
  - niter: # of iterations (set it to 1 for inference)
 
  - W_init: initial basis functions (can be empty in general, as they are learned iteratively)
+
+
+The results file in the specified results_folder contain the following saved variables:
+1) timeseries - a num_cell by num_frames matrix of extracted activity, the average of pixel activities within the extracted ROI
+2) ROI_mask - A binary image containing all the extracted ROIs
+3) ROIs - A cell array of individual ROIs, each is a struct with fields: row, col (location), type (object type), mask (a binary mask centred at the location)
+4) patches - a patch_x by patch_y by num_frames by num_cells matrix of the extracted image patches containing proposed cells
+5) model - the chomp_model resulting from the inference with all inferred parameters
+6) opt - the usual chomp_options

@@ -49,8 +49,10 @@ classdef chomp_input < handle
     
     %Change data pathes if options change
     function opt_change_pre(obj, src, evnt)
-      disp('opt_change_pre')
-      disp(obj);
+      if obj.opt.verbose > 1
+        disp('opt_change_pre')
+        disp(obj);
+      end
       obj.data.raw_stack.Y.Source(1:(length(obj.opt.root_folder))) = []; %Just get the substring with the original root folder removed
       if isa(obj.data.proc_stack.Y, 'chomp_data')
         obj.data.proc_stack.Y.Source(1:(length(obj.opt.root_folder))) = [];
@@ -58,7 +60,9 @@ classdef chomp_input < handle
     end
     
     function opt_change_post(obj, src, evnt)
-      disp('opt_change_post')
+      if obj.opt.verbose > 1
+        disp('opt_change_post')
+      end
       obj.data.raw_stack.Y.Source = [obj.opt.root_folder obj.data.raw_stack.Y.Source];
       if isa(obj.data.proc_stack.Y, 'chomp_data')
         obj.data.proc_stack.Y.Source = [obj.opt.root_folder obj.data.proc_stack.Y.Source];

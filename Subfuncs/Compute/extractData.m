@@ -25,7 +25,9 @@ if exist(intermediate_path, 'file')
        'from your input options file to create a new preprocessed file']);
   else
     if ~struct_contain(opt, inp.opt) %some settings has changed, give warning, and let user create a new copy of the file with new timestamp
-      warning('CHOMP:preprocess:outdatedoptions', 'The new option struct has slightly different options than the intermediate file you want to use it with.');
+      if opt.verbose>1
+        warning('CHOMP:preprocess:outdatedoptions', 'The new option struct has slightly different options than the intermediate file you want to use it with.');
+      end
       inp.opt = struct_merge(inp.opt, opt);
       intermediate_path = get_path(inp.opt);
       save(intermediate_path, 'inp', '-append'); %overwrite the old input file
@@ -100,8 +102,10 @@ else %Handle the data loading-preprocessing-saving
             append(data.proc_stack.Y, Ytmp(:,:,1:(mod(min(((s2+1)*100),T)-1,100)+1)));
           end
           s2 = s2+1;
-          if charcount>0, for c1 = 1:charcount, fprintf('\b'); end; end
-          charcount = fprintf('Reading images and creating virtual stack... %d/%d',min(s2*100,T), T);
+          if opt.verbose
+            if charcount>0, for c1 = 1:charcount, fprintf('\b'); end; end
+            charcount = fprintf('Reading images and creating virtual stack... %d/%d',min(s2*100,T), T);
+          end
         end
       end
   end % data reading
@@ -159,7 +163,9 @@ else %Handle the data loading-preprocessing-saving
   %Apply whitening to the whole stack (whitening with respect to the
   %smoothing filter sizes set, not on a pixel-by-pixel level!)
   
-  fprintf('\nPreprocessing image stack...');
+  if opt.verbose
+    fprintf('\nPreprocessing image stack...');
+  end
   if opt.whiten
       for t1 = 1:T
         tmp = squeeze(data.proc_stack.Y(:,:,t1)-opt.A) ./ (opt.B.^0.5);

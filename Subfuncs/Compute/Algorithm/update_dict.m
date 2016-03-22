@@ -27,12 +27,10 @@ switch opt.learn_decomp
   case 'COV'
     [U,Sv,explained] = pcacov(patch_cov);
     Sv = sqrt(Sv*(col_count-num_cells));
-  case 'LMSVD'    
-    [U, Sv] = lmsvd(patches,k);
   case 'MTF'
     %TODO Maybe sometime later
   case 'HOSVD'
-    [U, Sv] = svd(patches,'econ');    
+    [U, Sv] = svds(patches,k);
   otherwise %raise error
     error('CHOMP:learning:dict_update', 'Dictionary update option string (opt.learn_decomp) does not correspond to implemented options.');
     
