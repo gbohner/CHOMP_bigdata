@@ -30,7 +30,7 @@ if exist(intermediate_path, 'file')
       end
       inp.opt = struct_merge(inp.opt, opt);
       intermediate_path = get_path(inp.opt);
-      save(intermediate_path, 'inp', '-append'); %overwrite the old input file
+      save(intermediate_path, 'inp'); %overwrite the old input file
     end
   end
      

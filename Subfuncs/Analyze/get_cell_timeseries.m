@@ -22,18 +22,21 @@ if opt.fig
   update_visualize( y_orig,H,reshape(W,opt.m,opt.m,size(W,2)),opt,1,1);
 end
 %opt.ROI_type = 'quantile_dynamic_origsize';
-opt.ROI_params = 0.4;
-[ROI_mask, ROIs] = getROIs(opt, numel(H),0); opt.fig = 2;
+[ROI_mask, ROIs] = getROIs(opt, numel(H),0);
 h_roi_figure= figure;
 if ~opt.fig, set(h_roi_figure,'Visible','off'); end 
 % subplottight(2, 1, 2);
 h_rois = imagesc(y_orig); colormap gray; axis image;
-B = bwboundaries(ROI_mask);
 hold on;
-visboundaries(B)
 mycolor = 'rymg';
 for i1 = 1:numel(ROIs)
-  text(ROIs{i1}.col, ROIs{i1}.row, num2str(i1), 'Color', mycolor(mod(ROIs{i1}.type-1,length(mycolor))+1),'FontSize',20,'FontWeight','bold');
+  to_draw = bwboundaries(ROIs{i1}.mask);
+  for c1 = 1:numel(to_draw)
+    to_draw{c1}(:,1) = to_draw{c1}(:,1)+ROIs{i1}.col-floor(opt.m/2);
+    to_draw{c1}(:,2) = to_draw{c1}(:,2)+ROIs{i1}.row-floor(opt.m/2);
+    line(to_draw{c1}(:,1), to_draw{c1}(:,2), 'Color', mycolor(mod(ROIs{i1}.type-1,length(mycolor))+1));
+  end
+  text(ROIs{i1}.col-5, ROIs{i1}.row, num2str(i1), 'Color', mycolor(mod(ROIs{i1}.type-1,length(mycolor))+1),'FontSize',20,'FontWeight','bold');
 end
 
 set(gca, 'XTick', []);

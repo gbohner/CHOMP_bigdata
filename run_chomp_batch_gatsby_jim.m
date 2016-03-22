@@ -1,12 +1,12 @@
 close all;
 clear all;
 
-%Runs perfectly on the neurofast server
+%Runs perfectly on the gatsby leon
 
 %cd(fileparts(mfilename('fullpath')));
 addpath(genpath('.'));
 
-%setenv('CHOMP_ROOT_FOLDER','/nfs/data3/gergo/Jim2016/'); %
+setenv('CHOMP_ROOT_FOLDER','/nfs/data3/gergo/Jim2016/'); %
 
 opt_def_struct = struct(...
     'root_folder', getenv('CHOMP_ROOT_FOLDER'), ...
@@ -16,17 +16,17 @@ opt_def_struct = struct(...
     'results_folder', 'results/', ...
     'src_string', '*Ch2*', ...
     'data_type', 'frames_virtual', ...
-    'init_model',{{'filled','pointlike'}}, ...
+    'init_model',{{'filled','donut'}}, ...
     'stabilize', 1, ...
     'niter', 1, ...
     'm', 25, ...
     'mom', 2, ...
-    'fig',1, ...
+    'fig',0, ...
     'spatial_scale',1,...
     'time_scale',1,...
     'mask', 0, ...
     'cells_per_image', 50, ...
-    'KS', 6 ...
+    'KS', 10 ...
   );
 
 
@@ -87,8 +87,10 @@ for iters = 1:maxiter
     opts{n}.init_iter = iters-1;
     opts{n}.init_W = W_cur;
     %For last iteration do inference on many proposed objects
-    opts{n}.cells_per_image = opts{n}.cells_per_image * 10;
-    opts{n}.learn = 0;
+    if iters==maxiter
+      opts{n}.cells_per_image = opts{n}.cells_per_image * 10;
+      opts{n}.learn = 0;
+    end
     opts{n} = chomp(opts{n});
   end
   
@@ -104,8 +106,8 @@ for iters = 1:maxiter
     Hs{n} = outp.model.H;
   end
   for type = 1:opts{1}.NSS, Wblocked{type} = W_cur(:,opts{1}.Wblocks{type}); end
-  for type = 1:opts{1}.NSS
-    Wblocked{type} = update_dict(datas,Hs,Wblocked{type},opts,iters+2,type);
+  parfor type = 1:opts{1}.NSS
+    Wblocked{type} = update_dict(datas,Hs,Wblocked{type},opts,iters+1,type);
   end
   for type = 1:opts{1}.NSS, W_cur(:,opts{1}.Wblocks{type}) = Wblocked{type}; end
   
@@ -116,7 +118,7 @@ end
 
 %Get time series for all datasets
 timeseries = cell(numel(opts),1);
-for n = 1:numel(opts)
+parfor n = 1:numel(opts)
   timeseries{n} = get_cell_timeseries(opts{n});
 end
 
