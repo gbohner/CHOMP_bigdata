@@ -15,6 +15,8 @@ opt.code_path = [fileparts(mfilename('fullpath')) filesep];
 addpath(genpath(opt.code_path));
 cd(opt.code_path);
 
+mex('./Subfuncs/Compute/Mex/computeGW.c', '-outdir', './Subfuncs/Compute/Mex/');
+
 %Set current timestamp if not provided
 if isempty(opt.timestamp) %else use the specified timestamped file for re-analysis
   opt.timestamp = datestr(now, 30); 
