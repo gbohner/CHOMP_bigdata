@@ -73,12 +73,22 @@ for j = 1:opt.cells_per_image
     % Find maximum decrease  
     [AbsMin, ind] = min( dL(:).*repmat(Mask(:),Ntypes,1) );
     [row, col, type] = ind2sub(size(dL),ind);
-
+    
+    %Store the values (before changing them below, omg...)
+    H(j) = ind;
+    for mom = 1:opt.mom
+      X(j,(mom-1)*size(W,2)+opt.Wblocks{type}) = reshape(xk(row,col,(mom-1)*size(W,2)+opt.Wblocks{type}),1,[]); %TODO, check if leaving a bunch of zeros in X is reasonable, or rather have it just be size of opt.KSS and choose the respective block of W later
+    end
+    L(j,:) = AbsMin;
+    
     %Check if there is not enough likelihood decrease anymore
     if AbsMin > 0
       break;
     end
   
+    
+    
+    
   if opt.fig >1
 %     set(0,'CurrentFigure',h_dl); imagesc(dL_mom(:,:,1)); colorbar; pause(0.05);
     set(0,'CurrentFigure',h_dl); imagesc(dL(:,:,1).*Mask); colorbar; axis square;  pause(0.05);
@@ -133,13 +143,6 @@ if ~isempty(opt.spatial_push)
   grid_dist = opt.spatial_push(grid_dist); % Specified distance based function
   Mask(yinds{1},yinds{2},:) = Mask(yinds{1},yinds{2},:).*repmat(grid_dist,[1,1,size(Mask,3)]); % Make it impossible to put cells to close to eachother
 end
-  
-
-  H(j) = ind;
-  for mom = 1:opt.mom
-    X(j,(mom-1)*size(W,2)+opt.Wblocks{type}) = reshape(xk(row,col,(mom-1)*size(W,2)+opt.Wblocks{type}),1,[]); %TODO, check if leaving a bunch of zeros in X is reasonable, or rather have it just be size of opt.KSS and choose the respective block of W later
-  end
-  L(j,:) = AbsMin;
   
  if opt.fig >2
 %   writeVideo(Video_dl, getframe(h_dl));

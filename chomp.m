@@ -15,7 +15,15 @@ opt.code_path = [fileparts(mfilename('fullpath')) filesep];
 addpath(genpath(opt.code_path));
 cd(opt.code_path);
 
-mex('./Subfuncs/Compute/Mex/computeGW.c', '-outdir', './Subfuncs/Compute/Mex/');
+if ~exist(['./Subfuncs/Compute/Mex/computeGW.' mexext],'file')
+  try
+    mex('./Subfuncs/Compute/Mex/computeGW.c', '-outdir', './Subfuncs/Compute/Mex/');
+  catch ME
+    if opt.verbose>1
+      warning('CHOMP:compile:fallback', 'Unable to compile c files, falling back to slower Matlab functions');
+    end
+  end
+end
 
 %Set current timestamp if not provided
 if isempty(opt.timestamp) %else use the specified timestamped file for re-analysis

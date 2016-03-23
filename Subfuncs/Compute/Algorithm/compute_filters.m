@@ -95,16 +95,16 @@ for filt1 = 1:size(W,2)
       Wcur2 = Wcur2./norm(Wcur2(:)+1e-6); % make sure it has norm of 1.
       Wcur1c = Wcur1(:);
       Wcur2c = Wcur2(:);
-
-      GW{filt1,filt2,mom} = computeGW(GPT,Wcur1c,Wcur2c,opt.m,opt.mom,mom);
-%       tic;
-%       GW{filt1,filt2,mom} = zeros(2*opt.m-1, 2*opt.m-1);
-%       for s1 = 1:(2*opt.m-1)
-%         for s2 = 1:(2*opt.m-1)
-%           GW{filt1,filt2,mom}(s1,s2) = Wcur2c(GPT{s1,s2,mom}(:,2))'* Wcur1c(GPT{s1,s2,mom}(:,1)); %compute the shifted effect in original space via the shift tensors GPT. Because the Worigs were computed to correspond to the best inverse of the Ws
-%         end
-%       end
-%       toc
+      if exist(['./Subfuncs/Compute/Mex/computeGW.' mexext],'file') %Quicker c for loop
+        GW{filt1,filt2,mom} = computeGW(GPT,Wcur1c,Wcur2c,opt.m,opt.mom,mom);
+      else
+        GW{filt1,filt2,mom} = zeros(2*opt.m-1, 2*opt.m-1); %Slower Matlab for loop
+        for s1 = 1:(2*opt.m-1)
+          for s2 = 1:(2*opt.m-1)
+            GW{filt1,filt2,mom}(s1,s2) = Wcur2c(GPT{s1,s2,mom}(:,2))'* Wcur1c(GPT{s1,s2,mom}(:,1)); %compute the shifted effect in original space via the shift tensors GPT. Because the Worigs were computed to correspond to the best inverse of the Ws
+          end
+        end
+      end
     end
   end
 end

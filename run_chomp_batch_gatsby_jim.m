@@ -3,10 +3,13 @@ clear all;
 
 %Runs perfectly on the gatsby leon
 
-%cd(fileparts(mfilename('fullpath')));
+cd(fileparts(mfilename('fullpath')));
 addpath(genpath('.'));
 
 setenv('CHOMP_ROOT_FOLDER','/nfs/data3/gergo/Jim2016/'); %
+if ~exist(['./Subfuncs/Compute/Mex/computeGW.' mexext],'file')
+  mex('./Subfuncs/Compute/Mex/computeGW.c', '-outdir', './Subfuncs/Compute/Mex/');
+end
 
 opt_def_struct = struct(...
     'root_folder', getenv('CHOMP_ROOT_FOLDER'), ...

@@ -12,24 +12,24 @@ function timeseries = get_cell_timeseries(opt)
 load(get_path(opt),'inp');
 data = inp.data;
 load(get_path(inp.opt,'output_iter',inp.opt.niter),'model');
-[H, W, X, y_orig, y, L] = model.get_fields( 'H', 'W', 'X', 'y_orig','y','L');
 opt=inp.opt;
 
 
 
 %% Getting ROIs
+[H, W, X, y_orig, y, L] = model.get_fields( 'H', 'W', 'X', 'y_orig','y','L');
 if opt.fig
   update_visualize( y_orig,H,reshape(W,opt.m,opt.m,size(W,2)),opt,1,1);
 end
 %opt.ROI_type = 'quantile_dynamic_origsize';
-[ROI_mask, ROIs] = getROIs(opt, numel(H),0);
+%[ROI_mask, ROIs] = getROIs(opt, numel(H),0);
 h_roi_figure= figure;
 if ~opt.fig, set(h_roi_figure,'Visible','off'); end 
 % subplottight(2, 1, 2);
 h_rois = imagesc(y_orig); colormap gray; axis image;
 hold on;
 mycolor = 'rymg';
-for i1 = 1:numel(ROIs)
+for i1 = 1:min(numel(ROIs),100)
   to_draw = bwboundaries(ROIs{i1}.mask);
   for c1 = 1:numel(to_draw)
     to_draw{c1}(:,1) = to_draw{c1}(:,1)+ROIs{i1}.col-floor(opt.m/2);
@@ -42,7 +42,7 @@ end
 set(gca, 'XTick', []);
 set(gca, 'YTick', []);
 
-print(gcf,get_path(opt,'results_image'),'-dpng')
+%print(gcf,get_path(opt,'results_image'),'-dpng')
 
 
 %    
@@ -73,7 +73,7 @@ for i1 = 1:numel(H)
   timeseries(i1,:) = mply(ROIs{i1}.mask, patches(:,:,:,i1),2)./sum(ROIs{i1}.mask(:));
 end
 
-save(get_path(opt,'results'),'timeseries','ROIs','ROI_mask','patches','model','opt');
+save(get_path(opt,'results'),'timeseries','ROIs','ROI_mask','patches','model','opt', '-v7.3');
 
 %% Just plotting
 
