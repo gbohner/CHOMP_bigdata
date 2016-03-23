@@ -5,7 +5,7 @@ function [opt, ROI_mask, ROIs] = chomp( opt )
 %   opt is a class of chomp-options
 %
 %   Written by Gergo Bohner <gbohner@gatsby.ucl.ac.uk> - 2015/11/12
-%   Last update - 2016/03/15
+%   Last update - 2016/03/22
 
 gtic = tic;
 
@@ -39,19 +39,27 @@ end
 
 %Stabilize the image stack
 opt = StabilizeFrames(opt);
-toc(gtic);
+if opt.verbose
+  toc(gtic);
+end
 
 %Preprocess the data, store it in the input folder, time-stamped
 opt = extractData(opt);
-toc(gtic);
+if opt.verbose
+  toc(gtic);
+end
 
 %Learn the cell model from the data, store in the output folder
 Model_learn(opt);
-toc(gtic);
+if opt.verbose
+  toc(gtic);
+end
 
 %Collect results
 [ROI_mask, ROIs] = getROIs(opt);
-toc(gtic);
+if opt.verbose
+  toc(gtic);
+end
 
 %Clean up if required (delete unnecessary inbetween files etc)
 if opt.cleanup

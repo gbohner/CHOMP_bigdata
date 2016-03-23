@@ -63,7 +63,7 @@ end
 for mom = 1:opt.mom
   for type = 1:opt.NSS
     WnormInv(opt.Wblocks{type},opt.Wblocks{type},mom) = ...
-      inv(WnormInv(opt.Wblocks{type},opt.Wblocks{type},mom)+eye(numel(opt.Wblocks{type}))); % Regularized
+      inv(WnormInv(opt.Wblocks{type},opt.Wblocks{type},mom)+ 0.001 * eye(numel(opt.Wblocks{type}))); % Regularized
   end 
 end
 

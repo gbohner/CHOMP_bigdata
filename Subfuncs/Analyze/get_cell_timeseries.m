@@ -22,7 +22,7 @@ if opt.fig
   update_visualize( y_orig,H,reshape(W,opt.m,opt.m,size(W,2)),opt,1,1);
 end
 %opt.ROI_type = 'quantile_dynamic_origsize';
-%[ROI_mask, ROIs] = getROIs(opt, numel(H),0);
+[ROI_mask, ROIs] = getROIs(opt, numel(H),0);
 h_roi_figure= figure;
 if ~opt.fig, set(h_roi_figure,'Visible','off'); end 
 % subplottight(2, 1, 2);
@@ -34,7 +34,7 @@ for i1 = 1:min(numel(ROIs),100)
   for c1 = 1:numel(to_draw)
     to_draw{c1}(:,1) = to_draw{c1}(:,1)+ROIs{i1}.col-floor(opt.m/2);
     to_draw{c1}(:,2) = to_draw{c1}(:,2)+ROIs{i1}.row-floor(opt.m/2);
-    line(to_draw{c1}(:,1), to_draw{c1}(:,2), 'Color', mycolor(mod(ROIs{i1}.type-1,length(mycolor))+1));
+    line(to_draw{c1}(:,1), to_draw{c1}(:,2), 'Color', mycolor(mod(ROIs{i1}.type-1,length(mycolor))+1),'LineWidth',2);
   end
   text(ROIs{i1}.col-5, ROIs{i1}.row, num2str(i1), 'Color', mycolor(mod(ROIs{i1}.type-1,length(mycolor))+1),'FontSize',20,'FontWeight','bold');
 end
@@ -42,7 +42,7 @@ end
 set(gca, 'XTick', []);
 set(gca, 'YTick', []);
 
-%print(gcf,get_path(opt,'results_image'),'-dpng')
+print(gcf,get_path(opt,'results_image'),'-dpng')
 
 
 %    
@@ -76,6 +76,8 @@ end
 save(get_path(opt,'results'),'timeseries','ROIs','ROI_mask','patches','model','opt', '-v7.3');
 
 %% Just plotting
+
+load(get_path(opt,'results'),'timeseries')
 
 if opt.fig
   figure; 
