@@ -55,7 +55,7 @@ parfor c1 = 1:numel(datas)
   else
     %Process the individual patches to get n-order estimates
     for h1 = 1:numel(H)
-      disp(h1);
+      %disp(h1);
       curpy = get_n_order_patch(patches(:,:,:,h1), opt, szY);
       %Also weigth every moment tensor according to the number of independent
       %elements (patchsize multichoose mom) over total number of elements

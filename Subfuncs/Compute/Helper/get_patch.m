@@ -14,6 +14,7 @@ p.addRequired('opt',@(x)isa(x,'chomp_options'));
 p.addRequired('H',@isnumeric);
 p.addOptional('times',1:szRaw(end),@isnumeric);
 p.addParameter('scaled',0,@isnumeric);
+p.addParameter('minDiskAccess',0,@isnumeric);
 p.parse(stack,opt,H,varargin{:});
 
 

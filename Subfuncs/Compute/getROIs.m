@@ -42,12 +42,14 @@ end
 
 for i1 = 1:num_reconst
   [row,col,type] = ind2sub(sz,H(i1));
-  if opt.mom>=2 %Then reconstruct variance image
-    reconst = reshape(W(:,opt.Wblocks{type})*(X(i1, opt.NSS*opt.KS+opt.Wblocks{type})'), opt.m, opt.m);
-  else
-    reconst =  reshape(W(:,opt.Wblocks{type})*(X(i1, opt.Wblocks{type})'), opt.m, opt.m);
-  end
-  %reconst = imrotate(reconst, 180); %TODO think about if we need to
+%   if opt.mom>=2 %Then reconstruct variance image
+%     reconst = reshape(W(:,opt.Wblocks{type})*(X(i1, opt.NSS*opt.KS+opt.Wblocks{type})'), opt.m, opt.m);
+%   else
+    reconst =  reshape(W(:,opt.Wblocks{type})*(X(i1, opt.Wblocks{type})'), opt.m, opt.m); %use mean image reconstruction
+%   end
+  
+  reconst_orig = reconst;
+  reconst = imrotate(reconst, 180); %TODO think about if we need to
   %rotate, make sure its in accordance with the convolution procedure
   
   if opt.fig>=3
@@ -108,7 +110,7 @@ for i1 = 1:num_reconst
   end
   
   %Store results in cells now, later add option for json output %TODO
-  ROIs{i1} = struct('col', col, 'row', row, 'type', type, 'mask', reconst);
+  ROIs{i1} = struct('col', col, 'row', row, 'type', type, 'mask', reconst, 'reconst', reconst_orig);
   
   
   

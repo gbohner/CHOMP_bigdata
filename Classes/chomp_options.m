@@ -114,7 +114,7 @@ classdef chomp_options < handle
       %in relation to basis function (i.e. expected cell) size
       obj.smooth_filter_mean = obj.m;
       obj.smooth_filter_var = obj.m;
-      obj.spatial_push = @(grid_dist)logsig(0.5*grid_dist-floor(obj.m/2-1)); %@(grid_dist, sharp)logsig(sharp*grid_dist-floor(sharp*2*obj.m/2-1));
+      obj.spatial_push = @(grid_dist)logsig(0.5*grid_dist-floor(obj.m/sqrt(2)-1)); %@(grid_dist, sharp)logsig(sharp*grid_dist-floor(sharp*2*obj.m/2-1));
     end
     
     function s = export_struct(obj, varargin)

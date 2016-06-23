@@ -7,9 +7,21 @@ if opt.fig > 1
   h_dl = figure(7);  
   h_dl2 = figure(8);  
   h_dl3 = figure(9);
-%   Video_dl = VideoWriter('likelihood_map.avi');
-%   Video_dl.FrameRate = 2;
-%   open(Video_dl);
+  h_comb = figure('Units','Normalized','Position',[0.1,0.1,0.7,0.8]);
+  if opt.fig >2
+%     Video_dl = VideoWriter('likelihood_map.avi');
+%     Video_dl.FrameRate = 2;
+%     open(Video_dl);
+%     Video_dl2 = VideoWriter('mean_score_map.avi');
+%     Video_dl2.FrameRate = 2;
+%     open(Video_dl2);
+%     Video_dl3 = VideoWriter('var_score_map.avi');
+%     Video_dl3.FrameRate = 2;
+%     open(Video_dl3);
+    Video_comb = VideoWriter('inference_video.avi');
+    Video_comb.FrameRate = 2;
+    open(Video_comb);
+  end
 end
 
 Ntypes = opt.NSS;
@@ -95,8 +107,15 @@ for j = 1:opt.cells_per_image
     set(0,'CurrentFigure',h_dl2); imagesc(dL_mom(:,:,1,min(1,size(dL_mom,4))).*Mask); colorbar; axis square; pause(0.05);
     set(0,'CurrentFigure',h_dl3); imagesc(dL_mom(:,:,1,min(2,size(dL_mom,4))).*Mask); colorbar; axis square; pause(0.05);
   
+    if opt.fig >2
+     load(get_path(opt,'output_iter',4),'model')
+     set(0,'CurrentFigure',h_comb);
+     subplot(2,2,1); imagesc(model.y_orig); colormap gray; axis square; axis off; title('Data');
+     subplot(2,2,3); imagesc(dL(:,:,1).*Mask); colormap default; colorbar; axis square; axis off; title('Total cost change');  pause(0.05);
+     subplot(2,2,2); imagesc(dL_mom(:,:,1,min(1,size(dL_mom,4))).*Mask); colorbar; axis square; axis off; title('r=1 cost change'); pause(0.05);
+     subplot(2,2,4); imagesc(dL_mom(:,:,1,min(2,size(dL_mom,4))).*Mask); colorbar; axis square; axis off; title('r=2 cost change'); pause(0.05);
 %    set(0,'CurrentFigure',h_dl3); imagesc(Mask(:,:,1)); colorbar; axis square; pause(0.05);
-  
+    end
   end
   
   
@@ -146,13 +165,18 @@ end
   
  if opt.fig >2
 %   writeVideo(Video_dl, getframe(h_dl));
-%   writeVideo(Video_yres, getframe(h_yres));
+%   writeVideo(Video_dl2, getframe(h_dl2));
+%   writeVideo(Video_dl3, getframe(h_dl3));
+  writeVideo(Video_comb, getframe(h_comb));
  end  
 %   disp([num2str(j) ' cells found, current type: ' num2str(type)]);
 end
 
   if opt.fig >2 
 %     close(Video_dl);
+%     close(Video_dl2);
+%     close(Video_dl3);
+    close(Video_comb);
   end
 % close(Video_yres);
 end

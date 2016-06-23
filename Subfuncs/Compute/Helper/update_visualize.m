@@ -41,7 +41,7 @@ alphaspace = logspace(1,0,numel(H))/10; %TODO make that it is according to the s
     figure(1); 
 			if cur_pc == 0, set(gcf, 'Visible', 'off'), end
 			visualSS(Wi, 4, KS, [-1 1]); colormap('jet')
-			if cur_pc == 0, print([opt.output_folder filesep opt.output_file_prefix '_fig1.eps'],'-depsc2'), end
+			%if cur_pc == 0, print([opt.output_folder filesep opt.output_file_prefix '_fig1.eps'],'-depsc2'), end
 
     figure(3);
 						if cur_pc == 0, set(gcf, 'Visible', 'off'), end
@@ -65,9 +65,9 @@ alphaspace = logspace(1,0,numel(H))/10; %TODO make that it is according to the s
       if show_numbers
         text(col, row, num2str(i12), 'Color',mycolor(mod(type-1,length(mycolor))+1),'FontSize',20,'FontWeight','bold');
       else
-        tmp1 = plot(col, row, 'or' , 'Linewidth', 2, 'MarkerSize', 4, 'MarkerFaceColor', mycolor(mod(type-1,length(mycolor))+1), 'MarkerEdgeColor', mycolor(mod(type-1,length(mycolor))+1));
-        %tmp1 = scatter(col, row, 30, 'r', 'filled'); %TODO show both multiple colors and alphas
-        %alpha(tmp1, alphaspace(i12))
+        %tmp1 = plot(col, row, 'or' , 'Linewidth', 2, 'MarkerSize', 4, 'MarkerFaceColor', mycolor(mod(type-1,length(mycolor))+1), 'MarkerEdgeColor', mycolor(mod(type-1,length(mycolor))+1));
+        tmp1 = scatter(col, row, 30, 'r', 'filled'); %TODO show both multiple colors and alphas
+        alpha(tmp1, alphaspace(i12))
       end
 %             text(col(i12), row(i12), num2str(i12), 'Color',mycolor(mod(map(i12)-1,length(mycolor))+1));
 %             title(i12);
@@ -77,7 +77,7 @@ alphaspace = logspace(1,0,numel(H))/10; %TODO make that it is according to the s
     hold off
 
     drawnow
-			if cur_pc == 0, print([opt.output_folder filesep opt.output_file_prefix '_fig3.eps'],'-depsc2'), end
+	%		if cur_pc == 0, print([opt.output_folder filesep opt.output_file_prefix '_fig3.eps'],'-depsc2'), end
 
       
   function visualSS( W, mag, rows,clims, varargin)
